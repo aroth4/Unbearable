@@ -22,14 +22,14 @@ public class GetLogin {
 		return makeGetRequest(username, password);
 	}
 
-	private Login makeGetRequest(String username, String password) {
+	private Login makeGetRequest(String username, String password) throws URISyntaxException, ClientProtocolException, IOException {
 		// TODO: Implement method to issue get item request
 				// Create HTTP client
 				 		HttpClient client = new DefaultHttpClient();
 						
 						// Construct URI
 						URI uri;
-						uri = URIUtils.createURI("http", "10.0.2.2", 8081, "/inventory/" + itemName, 
+						uri = URIUtils.createURI("http", "10.0.2.2", 8081, "/Unbearable/", 
 								    null, null);
 
 						// Construct request
@@ -44,7 +44,7 @@ public class GetLogin {
 							HttpEntity entity = response.getEntity();
 							
 							// Parse JSON
-							return JSON.getObjectMapper().readValue(entity.getContent(), Item.class);
+							return JSON.getObjectMapper().readValue(entity.getContent(), Login.class);
 						} 
 				// Return null if invalid response
 				return null;
