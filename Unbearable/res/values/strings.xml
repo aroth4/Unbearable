@@ -4,5 +4,13 @@
     <string name="app_name">Unbearable</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="user_name">Username</string>
+    <string name="password">Password</string>
+    <string name="LoginButton">Login</string>
+    <string name="RegisterButton">Register</string>
+    <string name="RegisterText">Please enter a desired username and password</string>
+    <string name="passwordCheck">Re-enter Password</string>
+    <string name="SubmitAccount">Submit</string>
+    <string name="cancel">Cancel</string>
 
 </resources>
