@@ -29,8 +29,9 @@ public class GetLogin {
 		return db.getLogin(username, password);
 	}
 	
-	public Login doPostReguest(String user, String pass) throws URISyntaxException, ClientProtocolException, IOException{
+	public Login doPostReguest(String user, String pass){
 		
-		return null;
+		IDatabase db = Database.getInstance();
+		return db.postLogin(user, pass);
 	}
 }
