@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -48,5 +51,10 @@ public class GetLogin {
 						} 
 				// Return null if invalid response
 				return null;
+	}
+	
+	public Login doPostReguest(String user, String pass) throws URISyntaxException, ClientProtocolException, IOException{
+		
+		return null;
 	}
 }
