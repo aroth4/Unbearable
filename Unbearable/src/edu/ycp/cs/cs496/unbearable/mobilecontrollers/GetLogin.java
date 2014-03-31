@@ -24,9 +24,9 @@ import edu.ycp.cs.cs496.unbearable.persist.IDatabase;
 
 
 public class GetLogin {
-	public Login getItem(String itemName) {
+	public Login getLogin(String username, String password) {
 		IDatabase db = Database.getInstance();
-		return db.getLogin(itemName);
+		return db.getLogin(username, password);
 	}
 	
 	public Login doPostReguest(String user, String pass) throws URISyntaxException, ClientProtocolException, IOException{

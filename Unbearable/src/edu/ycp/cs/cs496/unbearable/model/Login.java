@@ -58,7 +58,7 @@ public class Login {
 	 * 
 	 * @return the item quantity.
 	 */
-	public String getQuantity() {
+	public String getPassword() {
 		return password;
 	}
 	
