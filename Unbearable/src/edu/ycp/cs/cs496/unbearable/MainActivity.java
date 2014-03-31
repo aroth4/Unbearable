@@ -8,6 +8,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.http.client.ClientProtocolException;
 import org.xml.sax.SAXException;
 
+import edu.ycp.cs.cs496.unbearable.mobilecontrollers.GetLogin;
+import edu.ycp.cs.cs496.unbearable.model.Login;
 import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
 
 
@@ -98,7 +100,33 @@ public class MainActivity extends Activity {
 				// TODO Auto-generated method stub
 				try {
 					//LoginSuccess();
-					 Toast.makeText(MainActivity.this,"I need implemented!", Toast.LENGTH_LONG).show();
+					 //Toast.makeText(MainActivity.this,"I need implemented!", Toast.LENGTH_LONG).show();
+					GetLogin controller = new GetLogin();
+					EditText username = (EditText) findViewById(R.id.Login);
+			  		EditText password = (EditText) findViewById(R.id.Register);
+			  		
+			  		if(IsEmpty(username) || IsEmpty(password))
+			  		{
+			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
+			  		}
+			  		else
+			  		{
+			  			String checkName = username.toString();
+			  			String checkPass = username.toString();
+			  			
+			  			Login LoginCheck = controller.getLogin(checkName, checkPass);
+			  			if(LoginCheck != null)
+			  			{
+			  				//Username exists and is correct! Go to game
+			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
+			  			}
+			  			else
+			  			{
+			  				//username doesn't exist or was input wrong, return area
+			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
+			  			}
+			  			
+			  		}
 					 
 				}
 				catch (Exception e) {

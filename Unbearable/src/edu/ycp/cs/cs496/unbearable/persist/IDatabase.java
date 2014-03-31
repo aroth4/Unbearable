@@ -9,7 +9,7 @@ import edu.ycp.cs.cs496.unbearable.model.Login;
  */
 public interface IDatabase {
 
-	public Login getLogin(String itemName);
+	public Login getLogin(String username, String password);
 	
 
 	public Login postLogin(String username, String password);
