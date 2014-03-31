@@ -21,7 +21,7 @@ import edu.ycp.cs.cs496.unbearable.persist.IDatabase;
 
 
 public class GetLogin {
-	public Login getLogin(String username, String password) {
+	public boolean getLogin(String username, String password) {
 		IDatabase db = Database.getInstance();
 		return db.getLogin(username, password);
 	}

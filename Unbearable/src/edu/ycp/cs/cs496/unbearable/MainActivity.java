@@ -102,20 +102,20 @@ public class MainActivity extends Activity {
 					//LoginSuccess();
 					 //Toast.makeText(MainActivity.this,"I need implemented!", Toast.LENGTH_LONG).show();
 					GetLogin controller = new GetLogin();
-					EditText username = (EditText) findViewById(R.id.Login);
-			  		EditText password = (EditText) findViewById(R.id.Register);
-			  		
+					EditText username = (EditText) findViewById(R.id.UsernameInput);
+			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
 			  		if(IsEmpty(username) || IsEmpty(password))
 			  		{
 			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
 			  		}
 			  		else
 			  		{
-			  			String checkName = username.toString();
-			  			String checkPass = username.toString();
+			  			String checkName = username.getText().toString();
+			  			String checkPass = password.getText().toString();
 			  			
-			  			Login LoginCheck = controller.getLogin(checkName, checkPass);
-			  			if(LoginCheck != null)
+			  			boolean LoginCheck = controller.getLogin(checkName, checkPass);
+			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
+			  			if(LoginCheck == true)
 			  			{
 			  				//Username exists and is correct! Go to game
 			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();

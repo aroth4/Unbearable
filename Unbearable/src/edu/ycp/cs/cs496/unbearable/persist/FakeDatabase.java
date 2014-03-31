@@ -16,16 +16,20 @@ private List<Login> LoginList;
 
 	}
 	@Override
-	public Login getLogin(String username, String password) {
+	public boolean getLogin(String username, String password) {
 		//Check for existing login
 		for(Login login : LoginList)
 		{
-			if (login.getName().equals(username) && login.getPassword().equals(password)) {
-				// return a copy
-				return new Login(login.getName(), login.getPassword());
+			if (login.getName().equals(username)) {
+				if (login.getPassword().equals(password))
+				{
+				//return a copy
+				//return new Login(login.getName(), login.getPassword());
+				return true;
+				}
 			}
 		}
-		return null;
+		return false;
 	}
 
 	@Override
