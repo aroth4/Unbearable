@@ -6,9 +6,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import android.widget.Toast;
-
-import edu.ycp.cs.cs496.unbearable.RegistrationActivity;
 import edu.ycp.cs.cs496.unbearable.model.Login;
 
 public class FakeDatabase implements IDatabase {
@@ -50,9 +47,7 @@ private List<Login> LoginList;
 			}
 		}
 		if (result == false){
-			Login newLogin = new Login(username, password);
-			LoginList.add(newLogin);
-			return newLogin;
+			 return new Login(username, password);
 		}
 		return null;
 	}
