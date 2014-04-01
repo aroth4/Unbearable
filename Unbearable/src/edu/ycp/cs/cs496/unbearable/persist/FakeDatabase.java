@@ -6,6 +6,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import android.widget.Toast;
+
+import edu.ycp.cs.cs496.unbearable.RegistrationActivity;
 import edu.ycp.cs.cs496.unbearable.model.Login;
 
 public class FakeDatabase implements IDatabase {
@@ -37,9 +40,9 @@ private List<Login> LoginList;
 
 	@Override
 	public Login postLogin(String username, String password) {
-		// TODO Auto-generated method stub
+		// Add account if it does not exist
 		boolean result = false;
-		
+		//Check to make sure
 		for (Login login: LoginList){
 			if (login.getName().equals(username) && login.getPassword().equals(password)){
 				result = true;
@@ -47,7 +50,9 @@ private List<Login> LoginList;
 			}
 		}
 		if (result == false){
-			 return new Login(username, password);
+			Login newLogin = new Login(username, password);
+			LoginList.add(newLogin);
+			return newLogin;
 		}
 		return null;
 	}
