@@ -8,6 +8,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.http.client.ClientProtocolException;
 import org.xml.sax.SAXException;
 
+import edu.ycp.cs.cs496.unbearable.mobilecontrollers.GetLogin;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -103,6 +105,8 @@ public class RegistrationActivity extends Activity{
   			{
   				//Insert controller here to post it to database
   	  			Toast.makeText(RegistrationActivity.this,"Registration Successful!", Toast.LENGTH_LONG).show();
+  	  			GetLogin logControl = new GetLogin();
+  	  			logControl.doPostReguest(newUsername, newPassword);
   	  			startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
   				
 
