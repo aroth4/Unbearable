@@ -7,7 +7,7 @@
 	<!-- Servlets -->
 	<servlet>
 		<servlet-name>Unbearable</servlet-name>
-		<servlet-class>edu.ycp.cs.cs496.MainActivity.src.servlets.Unbearable</servlet-class>
+		<servlet-class>edu.ycp.cs.cs496.unbearable.servlets.UnbearableServlets</servlet-class>
 	</servlet>
 	
 	<!-- Servlet mappings (mapping of paths to servlets). -->
