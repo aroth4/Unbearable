@@ -83,6 +83,12 @@
                 android:text="@string/RegisterButton" />
         </LinearLayout>
 
+        <Button
+            android:id="@+id/GameTest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/GameTest" />
+
     </LinearLayout>
 
 </FrameLayout>
