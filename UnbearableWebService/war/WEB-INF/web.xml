@@ -13,7 +13,7 @@
 	<!-- Servlet mappings (mapping of paths to servlets). -->
 	<servlet-mapping>
 		<servlet-name>Unbearable</servlet-name>
-		<url-pattern>/Unbearable/*</url-pattern>
+		<url-pattern>/unbearable/*</url-pattern>
 	</servlet-mapping>
 
 </web-app>
