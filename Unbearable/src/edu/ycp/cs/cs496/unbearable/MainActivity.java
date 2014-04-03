@@ -91,6 +91,7 @@ public class MainActivity extends Activity {
         // TODO: Obtain references to widgets
         Button loginButton = (Button) findViewById(R.id.Login);
         Button registerButton = (Button) findViewById(R.id.Register);
+        Button gameButton = (Button) findViewById(R.id.GameTest);
         
         // TODO: Set onClickListeners for buttons
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +119,6 @@ public class MainActivity extends Activity {
 			  			if(LoginCheck == true)
 			  			{
 			  				//Username exists and is correct! Go to game
-			  				startActivity(new Intent(MainActivity.this, GameActivity.class));
 			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
 			  			}
 			  			else
@@ -154,6 +154,22 @@ public class MainActivity extends Activity {
 			}
 		});
         
+        
+        gameButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				try {
+					Toast.makeText(MainActivity.this,"Clicked game test!", Toast.LENGTH_LONG).show();
+					startActivity(new Intent(MainActivity.this, GameActivity.class));
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
 
     }
     
