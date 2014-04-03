@@ -12,5 +12,6 @@
     <string name="passwordCheck">Re-enter Password</string>
     <string name="SubmitAccount">Submit</string>
     <string name="cancel">Cancel</string>
+    <string name="GameTest">Test the Game!</string>
 
 </resources>

@@ -119,6 +119,7 @@ public class MainActivity extends Activity {
 			  			{
 			  				//Username exists and is correct! Go to game
 			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
+							startActivity(new Intent(MainActivity.this, GameActivity.class));
 			  			}
 			  			else
 			  			{
