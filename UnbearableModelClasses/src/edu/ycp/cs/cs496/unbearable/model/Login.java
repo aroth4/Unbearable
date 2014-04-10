@@ -3,7 +3,7 @@ package edu.ycp.cs.cs496.unbearable.model;
 public class Login {
 	
 /**
- * Class to represent an inventory item.
+ * Class is responsible for login (very username and password)
  */
 	private String username;
 	private String password;

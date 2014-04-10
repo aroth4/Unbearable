@@ -1,6 +1,4 @@
-package edu.ycp.cs.cs496.unbearable.persist;
-
-import java.util.List;
+package edu.ycp.cs.cs496.unbearable.model.persist;
 
 import edu.ycp.cs.cs496.unbearable.model.Login;
 

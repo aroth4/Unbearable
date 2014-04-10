@@ -6,14 +6,19 @@
 
 	<!-- Servlets -->
 	<servlet>
-		<servlet-name>Unbearable</servlet-name>
-		<servlet-class>edu.ycp.cs.cs496.unbearable.servlets.UnbearableServlets</servlet-class>
+		<servlet-name>LoginServlet</servlet-name>
+		<servlet-class>edu.ycp.cs.cs496.unbearable.servlets.LoginServlet</servlet-class>
 	</servlet>
 	
 	<!-- Servlet mappings (mapping of paths to servlets). -->
 	<servlet-mapping>
-		<servlet-name>Unbearable</servlet-name>
-		<url-pattern>/unbearable/*</url-pattern>
+		<servlet-name>LoginServlet</servlet-name>
+		<url-pattern>/login/*</url-pattern>
 	</servlet-mapping>
+	
+	<!-- Servlet context listeners -->
+	<listener>
+	    <listener-class>edu.ycp.cs.cs496.unbearable.servlets.DatabaseInitListener</listener-class>
+	</listener>
 
 </web-app>

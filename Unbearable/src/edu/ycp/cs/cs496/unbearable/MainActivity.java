@@ -1,35 +1,13 @@
 package edu.ycp.cs.cs496.unbearable;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.http.client.ClientProtocolException;
-import org.xml.sax.SAXException;
-
-import edu.ycp.cs.cs496.unbearable.mobilecontrollers.GetLogin;
-import edu.ycp.cs.cs496.unbearable.model.Login;
-import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
-
-
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
+import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -101,33 +79,37 @@ public class MainActivity extends Activity {
 				try {
 					//LoginSuccess();
 					 //Toast.makeText(MainActivity.this,"I need implemented!", Toast.LENGTH_LONG).show();
-					GetLogin controller = new GetLogin();
-					EditText username = (EditText) findViewById(R.id.UsernameInput);
-			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
-			  		if(IsEmpty(username) || IsEmpty(password))
-			  		{
-			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
-			  		}
-			  		else
-			  		{
-			  			String checkName = username.getText().toString();
-			  			String checkPass = password.getText().toString();
-			  			
-			  			boolean LoginCheck = controller.getLogin(checkName, checkPass);
-			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
-			  			if(LoginCheck == true)
-			  			{
-			  				//Username exists and is correct! Go to game
-			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
-							startActivity(new Intent(MainActivity.this, GameActivity.class));
-			  			}
-			  			else
-			  			{
-			  				//username doesn't exist or was input wrong, return area
-			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
-			  			}
-			  			
-			  		}
+					
+					
+					// TODO: use web service to log in
+					
+//					GetLogin controller = new GetLogin();
+//					EditText username = (EditText) findViewById(R.id.UsernameInput);
+//			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
+//			  		if(IsEmpty(username) || IsEmpty(password))
+//			  		{
+//			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
+//			  		}
+//			  		else
+//			  		{
+//			  			String checkName = username.getText().toString();
+//			  			String checkPass = password.getText().toString();
+//			  			
+//			  			boolean LoginCheck = controller.getLogin(checkName, checkPass);
+//			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
+//			  			if(LoginCheck == true)
+//			  			{
+//			  				//Username exists and is correct! Go to game
+//			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
+//							startActivity(new Intent(MainActivity.this, GameActivity.class));
+//			  			}
+//			  			else
+//			  			{
+//			  				//username doesn't exist or was input wrong, return area
+//			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
+//			  			}
+//			  			
+//			  		}
 					 
 				}
 				catch (Exception e) {

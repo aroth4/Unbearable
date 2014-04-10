@@ -1,14 +1,8 @@
-package edu.ycp.cs.cs496.unbearable.persist;
+package edu.ycp.cs.cs496.unbearable.model.persist;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import android.widget.Toast;
-
-import edu.ycp.cs.cs496.unbearable.RegistrationActivity;
 import edu.ycp.cs.cs496.unbearable.model.Login;
 
 public class FakeDatabase implements IDatabase {
