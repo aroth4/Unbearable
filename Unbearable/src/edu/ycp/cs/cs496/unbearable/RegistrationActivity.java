@@ -16,6 +16,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
+
 public class RegistrationActivity extends Activity{
 	
 	@Override
@@ -107,7 +109,8 @@ public class RegistrationActivity extends Activity{
   	  			// FIXME: use web service
 //  	  			GetLogin logControl = new GetLogin();
 //  	  			logControl.doPostReguest(newUsername, newPassword);
-//  	  			startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
+  	  			
+  	  			startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
   				
 
   			}
