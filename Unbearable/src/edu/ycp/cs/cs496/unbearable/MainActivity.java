@@ -69,6 +69,7 @@ public class MainActivity extends Activity {
         // TODO: Obtain references to widgets
         Button loginButton = (Button) findViewById(R.id.Login);
         Button registerButton = (Button) findViewById(R.id.Register);
+        Button gameTestButton = (Button) findViewById(R.id.gameTestButton);
         
         // TODO: Set onClickListeners for buttons
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +129,22 @@ public class MainActivity extends Activity {
 				try {
 					startActivity(new Intent(MainActivity.this, RegistrationActivity.class));
 					Toast.makeText(MainActivity.this,"Clicked!", Toast.LENGTH_LONG).show();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
+        
+        gameTestButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				try {
+					startActivity(new Intent(MainActivity.this, GameActivity.class));
+					Toast.makeText(MainActivity.this,"Clicked Game Test!", Toast.LENGTH_LONG).show();
 				}
 				catch (Exception e) {
 					e.printStackTrace();
