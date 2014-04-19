@@ -84,13 +84,13 @@ public class MainActivity extends Activity {
 					
 					// TODO: use web service to log in
 					
-//					GetLogin controller = new GetLogin();
-//					EditText username = (EditText) findViewById(R.id.UsernameInput);
-//			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
-//			  		if(IsEmpty(username) || IsEmpty(password))
-//			  		{
-//			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
-//			  		}
+					//GetLogin controller = new GetLogin();
+					EditText username = (EditText) findViewById(R.id.UsernameInput);
+			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
+			  		if(IsEmpty(username) || IsEmpty(password))
+			  		{
+			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
+			  		}
 //			  		else
 //			  		{
 //			  			String checkName = username.getText().toString();
