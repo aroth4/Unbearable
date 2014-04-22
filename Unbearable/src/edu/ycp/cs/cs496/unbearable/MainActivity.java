@@ -5,6 +5,9 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import edu.ycp.cs.cs496.unbearable.model.Login;
+import edu.ycp.cs.cs496.unbearable.model.json.JSON;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -18,10 +21,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.ycp.cs.cs496.unbearable.model.Login;
-import edu.ycp.cs.cs496.unbearable.model.json.*;
 import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
-import edu.ycp.cs.cs496.unbearable.model.json.JSON;
 
 
 import android.app.Activity;
