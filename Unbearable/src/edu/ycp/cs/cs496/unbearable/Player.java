@@ -10,13 +10,15 @@ public class Player extends Sprite {
 	private boolean moving;
 	private boolean jumping;
 	private boolean falling;
+	
+	private static final int initialDY = 16;
 
 	public Player(Resources res, int x, int y, int frameWidth, int frameHeight,
 			int fps, int fileID) {
 		super(res, x, y, frameWidth, frameHeight, fps, fileID);
 
-		dY = 10;
-		speed = 5;
+		dY = initialDY;
+		speed = 10;
 		moving = false;
 		jumping = false;
 		falling = false;
@@ -41,13 +43,8 @@ public class Player extends Sprite {
 			setFrameInitial(2);
 			setFrameFinal(2);
 			setCurrentFrame(2);
-			if (dY >= 9) {
-				falling = false;
-				dY = 10;
-			} else {
-				dY++;
-				setY(getY() + dY);
-			}
+			dY++;
+			setY(getY() + dY);
 		}
 
 		if (moving) {
@@ -74,6 +71,10 @@ public class Player extends Sprite {
 
 	public int getDY() {
 		return dY;
+	}
+	
+	public int getInitialDY() {
+		return initialDY;
 	}
 
 	public void setDY(int dY) {

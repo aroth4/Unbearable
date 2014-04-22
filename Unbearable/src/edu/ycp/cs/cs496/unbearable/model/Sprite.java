@@ -49,8 +49,8 @@ public class Sprite {
 		framePeriod = 1000 / fps;
 		
 		//set the top left x and y coordinates
-		this.x = x - (frameWidth / 2);
-		this.y = y - (frameHeight / 2);
+		this.x = x;
+		this.y = y;
 	}
 
 	Bitmap frameCreate(Bitmap d, boolean flip) {
@@ -140,7 +140,7 @@ public class Sprite {
 	}
 
 	public float getHeight() {
-		return bitmap.getHeight() / frameNumber;
+		return bitmap.getHeight();
 	}
 
 	public Orientation getOrientation() {
