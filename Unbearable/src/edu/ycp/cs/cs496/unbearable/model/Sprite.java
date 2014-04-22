@@ -1,100 +1,153 @@
 package edu.ycp.cs.cs496.unbearable.model;
 
-import java.util.Random;
-
-import edu.ycp.cs.cs496.unbearable.GamePanel;
-import edu.ycp.cs.cs496.unbearable.R;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.util.DisplayMetrics;
 
 public class Sprite {
-	private float mX;
-	private float mY;
-	private float mDx;
-	private float mDy;
-	private Bitmap mBitmap;
+	private Bitmap bitmap; // spritesheet
+
+	private int x, y; // top left x and y
+
+	private int frameNumber; // number of frames in animation
+	private int currentFrame; // current frame of animation
+	private int frameInitial; // initial frame in array
+	private int frameFinal; // last frame in array
 	
-	 // Constructor
-	   public Sprite(Resources res, int x, int y, int dx, int dy) {
-	      // Get bitmap from resource file
-	      mBitmap = BitmapFactory.decodeResource(res, R.drawable.bear_run);
+	private long frameTick; // time since last frame update
+	private int framePeriod; // time between each frame
 
-	      // Store upper left corner coordinates
-	      mX = x - mBitmap.getWidth()/2;
-	      mY = y - mBitmap.getHeight()/2;
+	private int frameWidth; // width of a sprite frame
+	private int frameHeight; // height of a sprite frame
 
-	      // Set random velocity
-	      Random rand = new Random();
-	      mDx = rand.nextInt(7) - 3;
-	      mDy = rand.nextInt(7) - 3;
-	   }
-
-	   // Render bitmap at current location 
-	   public void doDraw(Canvas canvas) {
-	      canvas.drawBitmap(mBitmap, mX, mY, null);
-	   }
-
-	   // Update (time-based) position
-	   public void update(long elapsedTime) {
-	      mX += mDx * (elapsedTime / 20f);
-	      mY += mDy * (elapsedTime / 20f);
-	      checkBoundary();
-	   }
-
-	   // Collision detection
-	   private void checkBoundary() {
-	      // Left or right boundary
-	      if (mX <= 0) {
-	         mDx *= -1;
-	         mX = 0;
-	      } else if (mX + mBitmap.getWidth() >= GamePanel.mWidth) {
-	         mDx *= -1;
-	         mX = GamePanel.mWidth - mBitmap.getWidth();
-	      }
-
-	      // Top or bottom boundary
-	      if (mY <= 0) {
-	         mDy *= -1;
-	         mY = 0;
-	      } else if (mY + mBitmap.getHeight() >= GamePanel.mHeight) {
-	         mDy *= -1;
-	         mY = GamePanel.mHeight - mBitmap.getHeight();
-	      }
-	   }
-	
-	// Velocity update method
-	public void changeVelocity(float ddx, float ddy) {
-		mDx += ddx;
-		mDy += ddy;
+	public enum Orientation {
+		// default set to left (player is default set to right)
+		LEFT, RIGHT
 	}
-	
-	// Getter methods
-	
+
+	Orientation orientation;
+
+	// Constructor
+	public Sprite(Resources res, int x, int y, int frameWidth, int frameHeight,
+			int fps, int fileID) {
+		bitmap = BitmapFactory.decodeResource(res, fileID);
+		this.frameWidth = frameWidth;
+		this.frameHeight = frameHeight;
+		frameNumber = (bitmap.getWidth() / frameWidth)
+				* (bitmap.getHeight() / frameHeight);
+		orientation = Orientation.LEFT;
+
+		currentFrame = 0;
+		frameInitial = 0;
+		frameFinal = 0;
+		frameTick = 0l;
+		framePeriod = 1000 / fps;
+		
+		//set the top left x and y coordinates
+		this.x = x - (frameWidth / 2);
+		this.y = y - (frameHeight / 2);
+	}
+
+	Bitmap frameCreate(Bitmap d, boolean flip) {
+		//creates frame and optionally flips it horizontally
+		Matrix m = new Matrix();
+		if (flip)
+			m.preScale(-1, 1);
+		Bitmap temp = Bitmap.createBitmap(d, (currentFrame * frameWidth), 0,
+				frameWidth, frameHeight, m, false);
+		return temp;
+	}
+
+	// Render bitmap at current location
+	public void doDraw(Canvas canvas) {
+		if (orientation == Orientation.LEFT) {
+			canvas.drawBitmap(frameCreate(bitmap, true), x, y, null);
+		} else {
+			canvas.drawBitmap(frameCreate(bitmap, false), x, y, null);
+		}
+	}
+
+	// Update frames
+	public void update(long elapsedTime) {
+		// cycle through frames if boundary frames are different
+		if (frameInitial != frameFinal) {
+			if (elapsedTime > framePeriod + frameTick) {
+				frameTick = elapsedTime;
+				currentFrame++;
+				if (currentFrame >= frameFinal) {
+					currentFrame = frameInitial;
+				}
+			}
+		}
+	}
+
+	// Getter/Setter methods
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public int getCurrentFrame() {
+		return currentFrame;
+	}
+
+	public void setCurrentFrame(int currentFrame) {
+		this.currentFrame = currentFrame;
+	}
+
+	public int getFrameInitial() {
+		return frameInitial;
+	}
+
+	public void setFrameInitial(int frameInitial) {
+		this.frameInitial = frameInitial;
+	}
+
+	public int getFrameFinal() {
+		return frameFinal;
+	}
+
+	public void setFrameFinal(int frameFinal) {
+		this.frameFinal = frameFinal;
+	}
+
 	public float getCenterX() {
-		return mX + mBitmap.getWidth()/2;
+		return x + frameWidth / 2;
 	}
-	
+
 	public float getCenterY() {
-		return mY + mBitmap.getHeight()/2;
+		return y + frameHeight / 2;
 	}
-	
+
 	public float getWidth() {
-		return mBitmap.getWidth()/2;
+		return bitmap.getWidth() / frameNumber;
 	}
-	
+
 	public float getHeight() {
-		return mBitmap.getHeight()/2;
-	}
-	
-	public float getXVelocity() {
-		return mDx;
-	}
-	
-	public float getYVelocity() {
-		return mDy;
+		return bitmap.getHeight() / frameNumber;
 	}
 
+	public Orientation getOrientation() {
+		return this.orientation;
+	}
+
+	public void setOrientation(Orientation orientation) {
+		this.orientation = orientation;
+	}
 }
-
