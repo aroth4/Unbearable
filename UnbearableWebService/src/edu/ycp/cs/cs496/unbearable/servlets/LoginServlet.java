@@ -24,16 +24,23 @@ public class LoginServlet extends HttpServlet {
 		
 		// Use a controller to determine if this username/password corresponds to an existing user
 		GetLogin controller = new GetLogin();
-		boolean result = controller.getLogin(userName, password);
+		login = controller.getLogin(userName, password);
 		
-		// TODO: if the login succeeded, set information in the session to
-		// record the fact that the client successfully logged in
-		
-		// Set status code and content type
-		resp.setStatus(HttpServletResponse.SC_OK);
-		resp.setContentType("application/json");
-				
-		// Return the item in JSON format
-		JSON.getObjectMapper().writeValue(resp.getWriter(), (Boolean)result);
+		if (login == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.setContentType("application/json");
+			JSON.getObjectMapper().writeValue(resp.getWriter(), (Boolean)false);
+		} else {
+			// The login succeeded: set information in the session to
+			// record the fact that the client successfully logged in
+			req.getSession().setAttribute("login", login);
+			
+			// Set status code and content type
+			resp.setStatus(HttpServletResponse.SC_OK);
+			resp.setContentType("application/json");
+					
+			// Return the item in JSON format
+			JSON.getObjectMapper().writeValue(resp.getWriter(), (Boolean)true);
+		}
 	}
 }

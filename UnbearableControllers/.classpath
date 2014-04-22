@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="I:/apacheJARS/httpcore-4.3.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CS496_Jetty"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UnbearableModelClasses"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Unbearable"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
