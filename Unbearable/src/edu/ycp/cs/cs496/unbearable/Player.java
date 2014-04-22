@@ -1,5 +1,7 @@
 package edu.ycp.cs.cs496.unbearable;
 
+import java.io.Console;
+
 import android.content.res.Resources;
 import edu.ycp.cs.cs496.unbearable.model.Sprite;
 
@@ -24,7 +26,7 @@ public class Player extends Sprite {
 		jumping = false;
 		falling = false;
 		worldMove = false;
-		localMove = GamePanel.getUpdateWorld();
+		
 		setOrientation(Orientation.RIGHT);
 	}
 
@@ -58,11 +60,12 @@ public class Player extends Sprite {
 
 			// cycle between frames 1 and 4
 			if (getOrientation() == Orientation.LEFT) {
-				setX(getX() - speed + localMove);
+				setX(getX() - speed - localMove*10);
 			} else {
-				setX(getX() + speed - localMove);
+				setX(getX() + speed + localMove*10);
 
 			}
+			System.out.println(localMove);
 		}
 
 		if (jumping == false && falling == false && moving == false) {
@@ -70,7 +73,7 @@ public class Player extends Sprite {
 			setFrameFinal(0);
 			setCurrentFrame(0);
 		}
-		
+		localMove = GamePanel.getUpdateWorld();
 		update(elapsedTime);
 	}
 

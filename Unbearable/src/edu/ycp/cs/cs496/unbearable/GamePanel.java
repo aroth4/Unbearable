@@ -23,6 +23,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	private ArrayList<Ledge> ledges = new ArrayList<Ledge>();
 	boolean ledgeDetected;
 	private static int wLoc; // world scroll location
+	private int loc;
 	
 	//used to get screen size for different devices
 	WindowManager wm;
@@ -39,6 +40,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		pObject.setColor(Color.WHITE);
 		mThread = new GameThread(this);
 		wLoc = 0;
+		loc = 128;
 		wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		display = wm.getDefaultDisplay();
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
@@ -69,7 +71,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		ledges.add(new Ledge(getResources(), 0, 192+64, 256, 64, 10,
 				R.drawable.ledgetest));
 		 */
-		ledges.add(new Ledge(getResources(), 300, screenSize.y - 48, 128, 32, 10,
+		ledges.add(new Ledge(getResources(), 300, screenSize.y - 48, loc, 32, 10,
 				R.drawable.ledge));
 //		ledges.add(new Ledge(getResources(), 200, screenSize.y - 148, 128, 32, 10,
 //				R.drawable.ledge));
@@ -100,17 +102,20 @@ public class GamePanel extends SurfaceView implements Callback {
 		player.updatePosition(System.currentTimeMillis());
 		checkLedge();
 		setUpdateWorld();
+		
 	}
 	//Set scrolling
 	public void setUpdateWorld()
 	{
 		if(player.getX() < 0)
 		{
-			wLoc -= 1;
+			wLoc = 1;
+			loc += 1;
 		}
-		if(player.getX() > (screenSize.x - 100))
+		if(player.getX() >= (screenSize.x - 99))
 		{
-			wLoc += 1;
+			wLoc = -1;
+			loc -= 1;
 		}
 	}
 	
@@ -137,7 +142,7 @@ public class GamePanel extends SurfaceView implements Callback {
 			//if not in the process of jumping OR falling, player's Y is not changing
 			//therefore, if it's on the ground or on a ledge, let its Y alone,
 			//and if it's in the air and its Y is not changing, make it fall
-			System.out.println("Detected Player's Y is not changing");
+			//System.out.println("Detected Player's Y is not changing");
 			if (player.getY() + player.getHeight() < groundLevel) {
 				//if player's bottom Y is above ground level, make it fall
 				System.out.println("Above ground, so should fall");
