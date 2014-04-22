@@ -6,7 +6,7 @@ import edu.ycp.cs.cs496.unbearable.model.persist.IDatabase;
 
 
 public class GetLogin {
-	public boolean getLogin(String username, String password) {
+	public Login getLogin(String username, String password) {
 		IDatabase db = DatabaseProvider.getInstance();
 		return db.getLogin(username, password);
 	}

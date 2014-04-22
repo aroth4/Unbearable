@@ -1,5 +1,15 @@
 package edu.ycp.cs.cs496.unbearable;
 
+import java.net.URI;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import edu.ycp.cs.cs496.unbearable.model.Login;
+import edu.ycp.cs.cs496.unbearable.model.json.*;
+import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
+
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -83,33 +93,34 @@ public class MainActivity extends Activity {
 					
 					// TODO: use web service to log in
 					
-//					GetLogin controller = new GetLogin();
-//					EditText username = (EditText) findViewById(R.id.UsernameInput);
-//			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
-//			  		if(IsEmpty(username) || IsEmpty(password))
-//			  		{
-//			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
-//			  		}
-//			  		else
-//			  		{
-//			  			String checkName = username.getText().toString();
-//			  			String checkPass = password.getText().toString();
-//			  			
-//			  			boolean LoginCheck = controller.getLogin(checkName, checkPass);
-//			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
-//			  			if(LoginCheck == true)
-//			  			{
-//			  				//Username exists and is correct! Go to game
-//			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
-//							startActivity(new Intent(MainActivity.this, GameActivity.class));
-//			  			}
-//			  			else
-//			  			{
-//			  				//username doesn't exist or was input wrong, return area
-//			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
-//			  			}
-//			  			
-//			  		}
+					EditText username = (EditText) findViewById(R.id.UsernameInput);
+			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
+			  		if(IsEmpty(username) || IsEmpty(password))
+			  		{
+			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
+			  		}
+			  		else
+			  		{
+			  			String checkName = username.getText().toString();
+			  			String checkPass = password.getText().toString();
+			  			
+			  			boolean LoginCheck = LoginPost(checkName, checkPass);
+			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
+			  			if(LoginCheck == true)
+			  			{
+			  				//Username exists and is correct! Go to game
+			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
+							startActivity(new Intent(MainActivity.this, GameActivity.class));
+			  			}
+			  			else
+			  			{
+			  				//username doesn't exist or was input wrong, return area
+			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
+			  			}
+			  			
+			  		}
+					
+					
 					 
 				}
 				catch (Exception e) {
@@ -117,6 +128,34 @@ public class MainActivity extends Activity {
 				}
 				
 			}
+			
+			public boolean LoginPost(String username, String password){
+		
+				// Create HTTP client
+//				HttpClient client = new DefaultHttpClient();
+//				
+//				JSON.getObjectMapper().writeValue(sw, newItem);
+				
+				//loginPost getPost = new loginPost();
+				Login login = new Login();
+				login.setUsername(username);
+				login.setPassword(password);
+//				@Override
+//				public Item addItem(String itemName, int numItem) {
+//					// add item to the inventory
+//					for (Item item : inventory){
+//						if(item.getName().equals(itemName)){
+//							item.setQuantity(numItem);
+//							return item;
+//						}
+//					
+//					}
+				
+				return false;
+				
+			}
+			
+			
 		});
         
         // TODO: Set onClickListeners for buttons
