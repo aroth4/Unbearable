@@ -16,6 +16,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.ycp.cs.cs496.unbearable.model.Login;
 import edu.ycp.cs.cs496.unbearable.model.json.*;
@@ -114,26 +115,26 @@ public class MainActivity extends Activity {
 			  		{
 			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
 			  		}
-//			  		else
-//			  		{
-//			  			String checkName = username.getText().toString();
-//			  			String checkPass = password.getText().toString();
-//			  			
-//			  			boolean LoginCheck = controller.getLogin(checkName, checkPass);
-//			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
-//			  			if(LoginCheck == true)
-//			  			{
-//			  				//Username exists and is correct! Go to game
-//			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
-//							startActivity(new Intent(MainActivity.this, GameActivity.class));
-//			  			}
-//			  			else
-//			  			{
-//			  				//username doesn't exist or was input wrong, return area
-//			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
-//			  			}
-//			  			
-//			  		}
+			  		else
+			  		{
+			  			String checkName = username.getText().toString();
+			  			String checkPass = password.getText().toString();
+			  			
+			  			boolean LoginCheck = LoginPost(checkName, checkPass);
+			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
+			  			if(LoginCheck == true)
+			  			{
+			  				//Username exists and is correct! Go to game
+			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
+							startActivity(new Intent(MainActivity.this, GameActivity.class));
+			  			}
+			  			else
+			  			{
+			  				//username doesn't exist or was input wrong, return area
+			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
+			  			}
+			  			
+			  		}
 					 
 				}
 				catch (Exception e) {
