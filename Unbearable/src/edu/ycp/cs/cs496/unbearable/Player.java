@@ -10,7 +10,8 @@ public class Player extends Sprite {
 	private boolean moving;
 	private boolean jumping;
 	private boolean falling;
-	
+	private boolean worldMove;
+	private int localMove;
 	private static final int initialDY = 16;
 
 	public Player(Resources res, int x, int y, int frameWidth, int frameHeight,
@@ -22,6 +23,8 @@ public class Player extends Sprite {
 		moving = false;
 		jumping = false;
 		falling = false;
+		worldMove = false;
+		localMove = GamePanel.getUpdateWorld();
 		setOrientation(Orientation.RIGHT);
 	}
 
@@ -55,9 +58,10 @@ public class Player extends Sprite {
 
 			// cycle between frames 1 and 4
 			if (getOrientation() == Orientation.LEFT) {
-				setX(getX() - speed);
+				setX(getX() - speed + localMove);
 			} else {
-				setX(getX() + speed);
+				setX(getX() + speed - localMove);
+
 			}
 		}
 
@@ -66,6 +70,7 @@ public class Player extends Sprite {
 			setFrameFinal(0);
 			setCurrentFrame(0);
 		}
+		
 		update(elapsedTime);
 	}
 
@@ -112,5 +117,10 @@ public class Player extends Sprite {
 	public void setFalling(boolean falling) {
 		this.falling = falling;
 	}
+	
+	public void setWorldMove(boolean worldMove){
+		this.worldMove = worldMove;
+	}
+	
 
 }

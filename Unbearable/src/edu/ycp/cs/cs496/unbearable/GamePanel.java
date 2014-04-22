@@ -22,6 +22,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	private Player player;
 	private ArrayList<Ledge> ledges = new ArrayList<Ledge>();
 	boolean ledgeDetected;
+	private static int wLoc; // world scroll location
 	
 	//used to get screen size for different devices
 	WindowManager wm;
@@ -37,7 +38,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		pObject = new Paint();
 		pObject.setColor(Color.WHITE);
 		mThread = new GameThread(this);
-		
+		wLoc = 0;
 		wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		display = wm.getDefaultDisplay();
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
@@ -70,8 +71,8 @@ public class GamePanel extends SurfaceView implements Callback {
 		 */
 		ledges.add(new Ledge(getResources(), 300, screenSize.y - 48, 128, 32, 10,
 				R.drawable.ledge));
-		ledges.add(new Ledge(getResources(), 200, screenSize.y - 148, 128, 32, 10,
-				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 200, screenSize.y - 148, 128, 32, 10,
+//				R.drawable.ledge));
 		
 		this.setFocusable(true);
 		this.requestFocus();
@@ -98,6 +99,25 @@ public class GamePanel extends SurfaceView implements Callback {
 	public void update(long elapsedTime) {
 		player.updatePosition(System.currentTimeMillis());
 		checkLedge();
+		setUpdateWorld();
+	}
+	//Set scrolling
+	public void setUpdateWorld()
+	{
+		if(player.getX() < 0)
+		{
+			wLoc -= 1;
+		}
+		if(player.getX() > (screenSize.x - 100))
+		{
+			wLoc += 1;
+		}
+	}
+	
+	//Get scrolling location
+	public static int getUpdateWorld()
+	{
+		return wLoc;
 	}
 	
 	public void checkLedge() {
@@ -199,7 +219,7 @@ public class GamePanel extends SurfaceView implements Callback {
 				"Current Frame: " + player.getCurrentFrame()
 				+ ", X: " + player.getX() + ", Y: " + player.getY() 
 				+ ", ledgeLeft: " + ledges.get(0).getLeftX() + ", ledgeRight: " + ledges.get(0).getRightX()
-				+ ", ledgeDetected: " + ledgeDetected
+				+ ", ledgeDetected: " + ledgeDetected + ", " + wLoc
 				//+ ", screen height: " + screenSize.y +  ", screen width: " + screenSize.x
 				//+ ", Bitmap Width: " + player.getWidth() + ", Bitmap Height: " + player.getHeight()
 				//+ ", Center Width: " + player.getCenterX() + "Center Height: " + player.getCenterY()
@@ -252,6 +272,10 @@ public class GamePanel extends SurfaceView implements Callback {
 			player.setMoving(!player.getMoving());
 		}
 		return true;
+	}
+	
+	public int getWorldMove(){
+		return wLoc;
 	}
 
 }
