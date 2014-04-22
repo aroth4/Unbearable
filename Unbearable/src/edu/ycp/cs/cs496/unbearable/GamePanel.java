@@ -1,6 +1,7 @@
 package edu.ycp.cs.cs496.unbearable;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -24,7 +25,10 @@ public class GamePanel extends SurfaceView implements Callback {
 	boolean ledgeDetected;
 	private static int wLoc; // world scroll location
 	private int loc;
-	
+	private ArrayList<Integer> randomsX = new ArrayList<Integer>();
+	private ArrayList<Integer> randomsY = new ArrayList<Integer>();
+	private Random randx, randy;
+	private int n;
 	//used to get screen size for different devices
 	WindowManager wm;
 	Display display;
@@ -40,9 +44,15 @@ public class GamePanel extends SurfaceView implements Callback {
 		pObject.setColor(Color.WHITE);
 		mThread = new GameThread(this);
 		wLoc = 0;
-		loc = 128;
+		loc = 0;
+		n = 10;
+		randx = new Random();
+		randy = new Random();
+		randx.setSeed(System.currentTimeMillis()+ 234235);
+		randy.setSeed(System.currentTimeMillis()+ 23489562);
 		wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		display = wm.getDefaultDisplay();
+
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
 		screenSize = new Point(display.getWidth(),display.getHeight() - statusBarHeight);
 		
@@ -58,26 +68,56 @@ public class GamePanel extends SurfaceView implements Callback {
 		//Debug crap (solved sort of)
 		//place images in NO_DPI to make Android NOT scale the images
 		//automatically (and therefore incorrectly)
-		/*
+		
+		randomListX(n);
+		randomListY(n);
 
-		ledges.add(new Ledge(getResources(), 0, 64, 128, 32, 10,
-				R.drawable.ledge));
-		ledges.add(new Ledge(getResources(), 0, 128, 256, 64, 10,
-				R.drawable.ledgetest));
-		ledges.add(new Ledge(getResources(), 0, 192, 256, 64, 10,
-				R.drawable.bear));
-		ledges.add(new Ledge(getResources(), 256, 192, 256, 64, 10,
-				R.drawable.ledgetest));
-		ledges.add(new Ledge(getResources(), 0, 192+64, 256, 64, 10,
-				R.drawable.ledgetest));
-		 */
-		ledges.add(new Ledge(getResources(), 300, screenSize.y - 48, loc, 32, 10,
-				R.drawable.ledge));
-//		ledges.add(new Ledge(getResources(), 200, screenSize.y - 148, 128, 32, 10,
+//		ledges.add(new Ledge(getResources(), 0, 64, 128, 32, 10,
+//				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 0, 128, 256, 64, 10,
+//				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 0, 192, 256, 64, 10,
+//				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 256, 192, 256, 64, 10,
+//				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 0, 192+64, 256, 64, 10,
 //				R.drawable.ledge));
 		
+		//Draw the ledges
+		for(int i = 0; i < n; i++)
+		{
+			ledges.add(new Ledge(getResources(), randomsX.get(i), randomsY.get(i), 128, 32, 10,
+					R.drawable.ledge));
+		}
+		 
+		//ledges.add(new Ledge(getResources(), 300,  48, 128, 32, 10,
+			//	R.drawable.ledge));
+
+
 		this.setFocusable(true);
 		this.requestFocus();
+	}
+	
+	//Set X coordinates for ledges
+	public ArrayList<Integer> randomListX(int n)
+	{
+		//Set random points for x,y
+		for (int i=0; i<n; i++)
+		{
+		    randomsX.add(randx.nextInt(2000));
+		}
+		return randomsX;
+	}
+	
+	//Set Y coordinates for ledges
+	public ArrayList<Integer> randomListY(int n)
+	{
+		//Set random points for x,y
+		for (int i=0; i<n; i++)
+		{
+		    randomsY.add(randy.nextInt(300));
+		}
+		return randomsY;
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
@@ -99,23 +139,43 @@ public class GamePanel extends SurfaceView implements Callback {
 	}
 
 	public void update(long elapsedTime) {
+		//Update player
 		player.updatePosition(System.currentTimeMillis());
+		//Check ledges
 		checkLedge();
+		//Update scrolling
 		setUpdateWorld();
+		//Update ledges
+		
+		for(int i = 0; i < ledges.size(); i++)
+		{
+			Ledge ledge = ledges.get(i);
+			ledge.setX(ledge.getLeftX() + loc);
+		}
 		
 	}
 	//Set scrolling
 	public void setUpdateWorld()
 	{
-		if(player.getX() < 0)
+		if(player.getX() <= 0)
 		{
 			wLoc = 1;
-			loc += 1;
+			if(player.getMoving() == true)
+				loc = 6;
+			else
+				loc = 0;
 		}
-		if(player.getX() >= (screenSize.x - 99))
+		else if(player.getX() >= (screenSize.x - 300))
 		{
 			wLoc = -1;
-			loc -= 1;
+			if(player.getMoving() == true)
+				loc = -6;
+			else
+				loc = 0;
+		}
+		else{
+			wLoc = 0;
+			loc = 0;
 		}
 	}
 	

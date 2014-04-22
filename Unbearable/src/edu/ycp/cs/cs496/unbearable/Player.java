@@ -60,12 +60,12 @@ public class Player extends Sprite {
 
 			// cycle between frames 1 and 4
 			if (getOrientation() == Orientation.LEFT) {
-				setX(getX() - speed - localMove*10);
+				setX(getX() - speed + localMove*10 );
 			} else {
-				setX(getX() + speed + localMove*10);
+				setX(getX() + speed + localMove*10 );
 
 			}
-			System.out.println(localMove);
+			//System.out.println(localMove);
 		}
 
 		if (jumping == false && falling == false && moving == false) {
