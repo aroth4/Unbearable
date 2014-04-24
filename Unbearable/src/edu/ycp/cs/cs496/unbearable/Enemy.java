@@ -9,7 +9,7 @@ public class Enemy extends Sprite {
 			int fps, int fileID) {
 		super(res, x, y, frameWidth, frameHeight, fps, fileID);
 		
-		// Skeleton without bones is just thin air! :o
+		// Skeleton without bones is just thin air! :o 
 		
 	}
 }

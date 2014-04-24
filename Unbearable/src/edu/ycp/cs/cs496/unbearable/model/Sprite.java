@@ -12,7 +12,7 @@ import android.util.DisplayMetrics;
 public class Sprite {
 	private Bitmap bitmap; // spritesheet
 
-	private int x, y; // top left x and y
+	private int x, y; // top left x and y 
 
 	private int frameNumber; // number of frames in animation
 	private int currentFrame; // current frame of animation
@@ -101,6 +101,22 @@ public class Sprite {
 
 	public void setY(int y) {
 		this.y = y;
+	}
+	
+	public int getRightX() {
+		return x + frameWidth;
+	}
+	
+	public void setRightX(int x) {
+		this.x = x - frameWidth;
+	}
+	
+	public int getBottomY() {
+		return y + frameHeight;
+	}
+	
+	public void setBottomY(int y) {
+		this.y = y - frameHeight;
 	}
 
 	public int getCurrentFrame() {

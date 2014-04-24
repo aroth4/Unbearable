@@ -24,7 +24,7 @@ public class GameThread extends Thread {
 		Canvas canvas = null;
 		sTime = System.currentTimeMillis();
 
-		while (mRun) {
+		while (mRun) { 
 			canvas = mHolder.lockCanvas();
 
 			if (canvas != null) {

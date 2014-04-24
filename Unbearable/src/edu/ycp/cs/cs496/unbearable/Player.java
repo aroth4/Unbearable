@@ -27,7 +27,7 @@ public class Player extends Sprite {
 		falling = false;
 		worldMove = false;
 		
-		setOrientation(Orientation.RIGHT);
+		setOrientation(Orientation.RIGHT); 
 	}
 
 	public void updatePosition(long elapsedTime) {
