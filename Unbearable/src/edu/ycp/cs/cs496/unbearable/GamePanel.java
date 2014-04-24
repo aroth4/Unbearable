@@ -21,6 +21,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	private Paint pObject;
 	private GameThread mThread;
 	private Player player;
+	private Background background;
 	private ArrayList<Ledge> ledges = new ArrayList<Ledge>();
 	boolean ledgeDetected;
 	private static int wLoc; // world scroll location
@@ -32,6 +33,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	boolean onGround;
 	boolean onLedge;
 	int highestLedge;
+	private int gameState = 1;
 	//used to get screen size for different devices
 	WindowManager wm;
 	Display display;
@@ -64,9 +66,10 @@ public class GamePanel extends SurfaceView implements Callback {
 		//width then height
 		/*player = new Player(getResources(), 10, screenSize.y - 74, 64, 64, 10,
 			R.drawable.bear);*/ //spawns bear on ground
+		background  = new Background(getResources(), 0, 0 + statusBarHeight, 2000, 400, 10, R.drawable.background);
 		player = new Player(getResources(), 10, 0, 64, 64, 10,
 			R.drawable.bear); //spawns bear at top of screen, so he falls to ground
-
+		
 		ledgeDetected=false;
 		onGround = false;
 		onLedge = false;
@@ -159,6 +162,8 @@ public class GamePanel extends SurfaceView implements Callback {
 			ledge.setX(ledge.getLeftX() + loc);
 		}
 		
+		background.setX(background.getLeftX() + loc);
+		
 	}
 	//Set scrolling
 	public void setUpdateWorld()
@@ -166,7 +171,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		if(player.getX() <= 0)
 		{
 			wLoc = 1;
-			if(player.getMoving() == true)
+			if(player.getMoving() == true && player.getX() >= 0)
 				loc = 6;
 			else
 				loc = 0;
@@ -174,7 +179,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		else if(player.getX() >= (screenSize.x - 300))
 		{
 			wLoc = -1;
-			if(player.getMoving() == true)
+			if(player.getMoving() == true && player.getX() <= 1500)
 				loc = -6;
 			else
 				loc = 0;
@@ -330,7 +335,8 @@ public void checkLedge(){
 	}
 
 	public void doDraw(Canvas canvas, long elapsed) {
-		canvas.drawColor(Color.BLUE);
+		canvas.drawColor(Color.WHITE);
+		background.doDraw(canvas);
 		synchronized (ledges) {
 			for (Ledge ledge : ledges) {
 				ledge.doDraw(canvas);
@@ -338,7 +344,6 @@ public void checkLedge(){
 		}
 		
 		player.doDraw(canvas);
-
 		// Debug information drawing
 		canvas.drawText(
 				"Current Frame: " + player.getCurrentFrame()
