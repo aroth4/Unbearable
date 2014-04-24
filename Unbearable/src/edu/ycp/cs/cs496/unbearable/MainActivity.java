@@ -24,10 +24,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
 
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -68,10 +72,15 @@ public class MainActivity extends Activity {
 	 */
 	private SystemUiHider mSystemUiHider;
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+	    getActionBar().hide();
+	    
 		setDefaultView();
 		
 	}
