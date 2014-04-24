@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
     	    }
     }
     
- // Method for displaying data entry view
+ // Method for displaying data entry view 
     public void setDefaultView() {
         setContentView(R.layout.activity_main);
         

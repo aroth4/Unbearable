@@ -37,7 +37,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	Display display;
 	Point screenSize;
 	
-	//area constants
+	//area constants 
 	private static int groundLevel;
 
 	public GamePanel(Context context, int statusBarHeight) {

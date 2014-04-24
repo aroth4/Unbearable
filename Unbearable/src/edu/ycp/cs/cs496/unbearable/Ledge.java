@@ -28,7 +28,7 @@ public class Ledge extends Sprite {
 	
 //	public static Ledge setLedge(Resources res, int x, int y, int frameWidth, int frameHeight, int fps, int fileID){
 //		return setLedge(res, x, y, frameWidth, frameHeight, fps, fileID);
-//	}
+//	} 
 	
 	public void setLeftX(int x) {
 		setX(x);
