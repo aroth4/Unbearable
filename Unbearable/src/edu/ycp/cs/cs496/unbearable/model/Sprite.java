@@ -102,6 +102,22 @@ public class Sprite {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public int getRightX() {
+		return x + frameWidth;
+	}
+	
+	public void setRightX(int x) {
+		this.x = x - frameWidth;
+	}
+	
+	public int getBottomY() {
+		return y + frameHeight;
+	}
+	
+	public void setBottomY(int y) {
+		this.y = y - frameHeight;
+	}
 
 	public int getCurrentFrame() {
 		return currentFrame;
