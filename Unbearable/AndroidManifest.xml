@@ -28,7 +28,9 @@
 		    android:name="edu.ycp.cs.cs496.unbearable.RegistrationActivity" >
 		</activity>
         <activity
-		    android:name="edu.ycp.cs.cs496.unbearable.GameActivity" >
+		    android:name="edu.ycp.cs.cs496.unbearable.GameActivity"
+		    android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape" >
 		</activity>
     </application>
 

@@ -5,6 +5,9 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import edu.ycp.cs.cs496.unbearable.model.Login;
+import edu.ycp.cs.cs496.unbearable.model.json.JSON;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -15,10 +18,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import edu.ycp.cs.cs496.unbearable.model.Login;
+
 import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
-import edu.ycp.cs.cs496.unbearable.model.json.JSON;
+
 
 import android.app.Activity;
 import android.content.Intent;
@@ -27,7 +33,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -89,6 +95,7 @@ public class MainActivity extends Activity {
         // TODO: Obtain references to widgets
         Button loginButton = (Button) findViewById(R.id.Login);
         Button registerButton = (Button) findViewById(R.id.Register);
+        Button gameTestButton = (Button) findViewById(R.id.gameTestButton);
         
         // TODO: Set onClickListeners for buttons
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +110,7 @@ public class MainActivity extends Activity {
 					
 					// TODO: use web service to log in
 					
+					//GetLogin controller = new GetLogin();
 					EditText username = (EditText) findViewById(R.id.UsernameInput);
 			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
 			  		if(IsEmpty(username) || IsEmpty(password))
@@ -129,8 +137,6 @@ public class MainActivity extends Activity {
 			  			}
 			  			
 			  		}
-					
-					
 					 
 				}
 				catch (Exception e) {
@@ -182,6 +188,7 @@ public class MainActivity extends Activity {
 			}
 			
 			
+
 		});
         
         // TODO: Set onClickListeners for buttons
@@ -193,6 +200,22 @@ public class MainActivity extends Activity {
 				try {
 					startActivity(new Intent(MainActivity.this, RegistrationActivity.class));
 					Toast.makeText(MainActivity.this,"Clicked!", Toast.LENGTH_LONG).show();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
+        
+        gameTestButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				try {
+					startActivity(new Intent(MainActivity.this, GameActivity.class));
+					Toast.makeText(MainActivity.this,"Clicked Game Test!", Toast.LENGTH_LONG).show();
 				}
 				catch (Exception e) {
 					e.printStackTrace();

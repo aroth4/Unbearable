@@ -1,49 +1,131 @@
 package edu.ycp.cs.cs496.unbearable;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.view.Display;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
-
-import edu.ycp.cs.cs496.unbearable.model.Sprite;
+import android.view.WindowManager;
+import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
 
 public class GamePanel extends SurfaceView implements Callback {
-	public static float mWidth;
-	public static float mHeight;
-	// TODO: Add class fields
 	private Paint pObject;
-	//private Thread rThread;
 	private GameThread mThread;
-	private ArrayList<Sprite> mSpriteList = new ArrayList<Sprite>();
-	private int mNumSprites;
+	private Player player;
+	private ArrayList<Ledge> ledges = new ArrayList<Ledge>();
+	boolean ledgeDetected;
+	private static int wLoc; // world scroll location
+	private int loc;
+	private ArrayList<Integer> randomsX = new ArrayList<Integer>();
+	private ArrayList<Integer> randomsY = new ArrayList<Integer>();
+	private Random randx, randy;
+	private int n;
+	//used to get screen size for different devices
+	WindowManager wm;
+	Display display;
+	Point screenSize;
 	
-	public GamePanel(Context context) {
+	//area constants
+	private static int groundLevel;
+
+	public GamePanel(Context context, int statusBarHeight) {
 		super(context);
-		// TODO: Initialize class fields
 		getHolder().addCallback(this);
-		//rThread = new Thread();
 		pObject = new Paint();
 		pObject.setColor(Color.WHITE);
 		mThread = new GameThread(this);
-		mSpriteList.add(new Sprite(getResources(), 10, 10, -3, 3));
-	    mNumSprites = mSpriteList.size();
+		wLoc = 0;
+		loc = 0;
+		n = 10;
+		randx = new Random();
+		randy = new Random();
+		randx.setSeed(System.currentTimeMillis()+ 234235);
+		randy.setSeed(System.currentTimeMillis()+ 23489562);
+		wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		display = wm.getDefaultDisplay();
+
+		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
+		screenSize = new Point(display.getWidth(),display.getHeight() - statusBarHeight);
+		
+		groundLevel = screenSize.y - 74; //74 is bear height (64) plus 10 to set arbitrary ground level
+		
+		//width then height
+		/*player = new Player(getResources(), 10, screenSize.y - 74, 64, 64, 10,
+			R.drawable.bear);*/ //spawns bear on ground
+		player = new Player(getResources(), 10, 0, 64, 64, 10,
+			R.drawable.bear); //spawns bear at top of screen, so he falls to ground
+
+		ledgeDetected=false;
+		//Debug crap (solved sort of)
+		//place images in NO_DPI to make Android NOT scale the images
+		//automatically (and therefore incorrectly)
+		
+		randomListX(n);
+		randomListY(n);
+
+//		ledges.add(new Ledge(getResources(), 0, 64, 128, 32, 10,
+//				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 0, 128, 256, 64, 10,
+//				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 0, 192, 256, 64, 10,
+//				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 256, 192, 256, 64, 10,
+//				R.drawable.ledge));
+//		ledges.add(new Ledge(getResources(), 0, 192+64, 256, 64, 10,
+//				R.drawable.ledge));
+		
+		//Draw the ledges
+		for(int i = 0; i < n; i++)
+		{
+			ledges.add(new Ledge(getResources(), randomsX.get(i), randomsY.get(i), 128, 32, 10,
+					R.drawable.ledge));
+		}
+		 
+		//ledges.add(new Ledge(getResources(), 300,  48, 128, 32, 10,
+			//	R.drawable.ledge));
+
+
+		this.setFocusable(true);
+		this.requestFocus();
+	}
+	
+	//Set X coordinates for ledges
+	public ArrayList<Integer> randomListX(int n)
+	{
+		//Set random points for x,y
+		for (int i=0; i<n; i++)
+		{
+		    randomsX.add(randx.nextInt(2000));
+		}
+		return randomsX;
+	}
+	
+	//Set Y coordinates for ledges
+	public ArrayList<Integer> randomListY(int n)
+	{
+		//Set random points for x,y
+		for (int i=0; i<n; i++)
+		{
+		    randomsY.add(randy.nextInt(300));
+		}
+		return randomsY;
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		// TODO Auto-generated method stub
-		mWidth = width;
-		mHeight = height;
 	}
 
 	public void surfaceCreated(SurfaceHolder holder) {
-		// TODO: Start thread
-		if(!mThread.isAlive()) {
+		if (!mThread.isAlive()) {
 			mThread = new GameThread(this);
 			mThread.setRunning(true);
 			mThread.start();
@@ -51,30 +133,214 @@ public class GamePanel extends SurfaceView implements Callback {
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		// TODO: Stop thread
-		if(mThread.isAlive()) {
+		if (mThread.isAlive()) {
 			mThread.setRunning(false);
 		}
 	}
 
 	public void update(long elapsedTime) {
-		// TODO: Update ball (thread safe) and check end of game
-		synchronized(mSpriteList) {
-			for (Sprite bSprite : mSpriteList) {
-				bSprite.update(elapsedTime);
-			}
+		//Update player
+		player.updatePosition(System.currentTimeMillis());
+		//Check ledges
+		checkLedge();
+		//Update scrolling
+		setUpdateWorld();
+		//Update ledges
+		
+		for(int i = 0; i < ledges.size(); i++)
+		{
+			Ledge ledge = ledges.get(i);
+			ledge.setX(ledge.getLeftX() + loc);
+		}
+		
+	}
+	//Set scrolling
+	public void setUpdateWorld()
+	{
+		if(player.getX() <= 0)
+		{
+			wLoc = 1;
+			if(player.getMoving() == true)
+				loc = 6;
+			else
+				loc = 0;
+		}
+		else if(player.getX() >= (screenSize.x - 300))
+		{
+			wLoc = -1;
+			if(player.getMoving() == true)
+				loc = -6;
+			else
+				loc = 0;
+		}
+		else{
+			wLoc = 0;
+			loc = 0;
 		}
 	}
 	
-	public void doDraw(Canvas canvas, long elapsed) {
-		canvas.drawColor(Color.BLUE);
-
-		// TODO: Draw bear (thread safe)
-		synchronized (mSpriteList) {
-			for (Sprite bSprite : mSpriteList) {
-				bSprite.doDraw(canvas);
+	//Get scrolling location
+	public static int getUpdateWorld()
+	{
+		return wLoc;
+	}
+	
+	public void checkLedge() {
+		//checks to see if bear is on the ground or a ledge
+		//if not on ledge return -1
+		//else return int equal to ledge in array
+//		if (player.getJumping() == false && player.getFalling() == false && 
+//				player.getY() < groundLevel && ledge == -1) { //OR if NOT on ledge
+//			player.setFalling(true);
+//			player.setDY(0);
+//		}
+//		if (player.getY() == groundLevel) {
+//			return -1;
+//		} else 
+		
+		if (player.getJumping() == false && player.getFalling() == false) {
+			//if not in the process of jumping OR falling, player's Y is not changing
+			//therefore, if it's on the ground or on a ledge, let its Y alone,
+			//and if it's in the air and its Y is not changing, make it fall
+			//System.out.println("Detected Player's Y is not changing");
+			if (player.getY() + player.getHeight() < groundLevel) {
+				//if player's bottom Y is above ground level, make it fall
+				System.out.println("Above ground, so should fall");
+				player.setFalling(true);
+				player.setDY(0);
+				return;
 			}
 		}
+		
+		if (player.getFalling()) {
+			//if player is falling
+			if (player.getY()> groundLevel) {
+				//if player's bottom Y is lower than ground level
+				System.out.println("Lower than ground, so should be on ground");
+				player.setFalling(false);
+				player.setDY(player.getInitialDY());
+				player.setY(groundLevel);
+			}
+		} 
+		
+		//check ledges here
+		synchronized(ledges) {
+			for (int i = 0; i < ledges.size(); i++) {
+				Ledge ledge = ledges.get(i);
+				
+				if (ledgeDetected) {
+					if (player.getX() < ledge.getRightX() && player.getX() + player.getWidth() > ledge.getLeftX()) {
+						//if a ledge was previously detected and the player is still within the boundaries of ledge, do nothing
+					} else {
+						//if not within boundaries still, make player start to fall
+						player.setFalling(true);
+						player.setDY(0);
+					}
+				}
+				
+				if (player.getY() < ledge.getTopY() && player.getFalling() == true) {
+						//&&
+						
+						/*(
+							//xleft > ledgeleft AND xleft < ledgeright 
+							(player.getX() > ledge.getLeftX() && player.getX() < ledge.getRightX()) ||
+							//xleft < ledgeright AND xright > ledgeleft
+							(player.getX() < ledge.getRightX() && player.getX() + player.getWidth() > ledge.getLeftX()) ||
+							//xright > ledgeleft AND xright < ledgeright
+							(player.getX() + player.getWidth() > ledge.getLeftX() && player.getX() + player.getWidth() < ledge.getRightX())
+						)*/
+					if (player.getX() < ledge.getRightX() && player.getX() + player.getWidth() > ledge.getLeftX()) {
+						ledgeDetected = true;
+						//player is falling and is above ledge, so allow it to
+						//fall until it reaches the ledge's top Y (on top of ledge)
+						if ((player.getY() + player.getHeight()) + player.getDY() >= ledge.getTopY()) {
+							//if the next update will cause the player to go under the ledge
+							//make the player on the ledge instead!
+							player.setFalling(false);
+							player.setY((int) (ledge.getTopY() - player.getHeight()));
+							player.setDY(player.getInitialDY());
+							return;
+						}
+					} else {
+						ledgeDetected = false;
+					}
+				}
+			}
+		}
+	}
+
+	public void doDraw(Canvas canvas, long elapsed) {
+		canvas.drawColor(Color.BLUE);
+		synchronized (ledges) {
+			for (Ledge ledge : ledges) {
+				ledge.doDraw(canvas);
+			}
+		}
+		
+		player.doDraw(canvas);
+
+		// Debug information drawing
+		canvas.drawText(
+				"Current Frame: " + player.getCurrentFrame()
+				+ ", X: " + player.getX() + ", Y: " + player.getY() 
+				+ ", ledgeLeft: " + ledges.get(0).getLeftX() + ", ledgeRight: " + ledges.get(0).getRightX()
+				+ ", ledgeDetected: " + ledgeDetected + ", " + wLoc
+				//+ ", screen height: " + screenSize.y +  ", screen width: " + screenSize.x
+				//+ ", Bitmap Width: " + player.getWidth() + ", Bitmap Height: " + player.getHeight()
+				//+ ", Center Width: " + player.getCenterX() + "Center Height: " + player.getCenterY()
+				, 10, 10, pObject);
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// possibly should be placed inside Player class
+		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+			player.setMoving(true);
+			player.setOrientation(Orientation.LEFT);
+			return true;
+		}
+		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+			player.setMoving(true);
+			player.setOrientation(Orientation.RIGHT);
+			return true;
+		}
+
+		if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+			if (player.getFalling() != true) {
+				player.setJumping(true);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		//The way this is now has the bear's movement end if EITHER key is let go,
+		//even if the other key is still held down,
+		//so, not correct behavior
+		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+			player.setMoving(false);
+			return true;
+		}
+		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+			player.setMoving(false);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			player.setMoving(!player.getMoving());
+		}
+		return true;
+	}
+	
+	public int getWorldMove(){
+		return wLoc;
 	}
 
 }
