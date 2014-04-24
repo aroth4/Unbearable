@@ -71,34 +71,22 @@ public class GamePanel extends SurfaceView implements Callback {
 		onGround = false;
 		onLedge = false;
 		highestLedge = -1;
-		//Debug crap (solved sort of)
-		//place images in NO_DPI to make Android NOT scale the images
-		//automatically (and therefore incorrectly)
 		
 		randomListX(n);
 		randomListY(n);
-
-		ledges.add(new Ledge(getResources(), 0, 64, 128, 32, 10,
+		for (int i = 0; i < screenSize.y; i+= 64) {
+		ledges.add(new Ledge(getResources(), 0, 128 + i, 128, 32, 10,
 				R.drawable.ledge));
-		ledges.add(new Ledge(getResources(), 0, 128, 128, 32, 10,
-				R.drawable.ledge));
-		ledges.add(new Ledge(getResources(), 0, 192, 128, 32, 10,
-				R.drawable.ledge));
+		}
 		ledges.add(new Ledge(getResources(), 256, 192, 128, 32, 10,
 				R.drawable.ledge));
-//		ledges.add(new Ledge(getResources(), 0, 192+64, 256, 64, 10,
-//				R.drawable.ledge));
 		
-		//Draw the ledges
+		//Add the ledges to array
 		for(int i = 0; i < n; i++)
 		{
 			ledges.add(new Ledge(getResources(), randomsX.get(i), randomsY.get(i), 128, 32, 10,
 					R.drawable.ledge));
 		}
-		 
-		//ledges.add(new Ledge(getResources(), 300,  48, 128, 32, 10,
-			//	R.drawable.ledge));
-
 
 		this.setFocusable(true);
 		this.requestFocus();
@@ -152,7 +140,6 @@ public class GamePanel extends SurfaceView implements Callback {
 		//Update scrolling
 		setUpdateWorld();
 		//Update ledges
-		
 		for(int i = 0; i < ledges.size(); i++)
 		{
 			Ledge ledge = ledges.get(i);
@@ -295,25 +282,6 @@ public void checkLedge(){
 						System.out.println("Player is NOT within X boundaries of ledge " + i);
 					}
 				}
-				
-				
-				
-				//at this point, we have the highest ledge as ledgeDetected, so check if player is there
-				
-				
-				
-				//then, reset values maybe?
-				
-
-				//						//now check if player is going to be below ledge at next update
-				//						if (player.getBottomY() + player.getDY() >= ledges.get(ledgeDetected).getTopY()) {
-				//							//if player is going to fall through ledge at next update,
-				//							//set player to be on ledge, and stop falling
-				//							System.out.println("Player hit ledge " + i + ", now standing on it");
-				//							player.setFalling(false);
-				//							player.setDY(player.getInitialDY());
-				//							player.setBottomY(ledges.get(ledgeDetected).getTopY());
-				//						}
 				
 			}
 			System.out.println("Will land on ledge " + highestLedge);
