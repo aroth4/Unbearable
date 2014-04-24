@@ -1,5 +1,25 @@
 package edu.ycp.cs.cs496.unbearable;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import edu.ycp.cs.cs496.unbearable.model.Login;
+import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
+import edu.ycp.cs.cs496.unbearable.model.json.JSON;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +27,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
+
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -84,33 +104,34 @@ public class MainActivity extends Activity {
 					
 					// TODO: use web service to log in
 					
-					//GetLogin controller = new GetLogin();
 					EditText username = (EditText) findViewById(R.id.UsernameInput);
 			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
 			  		if(IsEmpty(username) || IsEmpty(password))
 			  		{
 			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
 			  		}
-//			  		else
-//			  		{
-//			  			String checkName = username.getText().toString();
-//			  			String checkPass = password.getText().toString();
-//			  			
-//			  			boolean LoginCheck = controller.getLogin(checkName, checkPass);
-//			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
-//			  			if(LoginCheck == true)
-//			  			{
-//			  				//Username exists and is correct! Go to game
-//			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
-//							startActivity(new Intent(MainActivity.this, GameActivity.class));
-//			  			}
-//			  			else
-//			  			{
-//			  				//username doesn't exist or was input wrong, return area
-//			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
-//			  			}
-//			  			
-//			  		}
+			  		else
+			  		{
+			  			String checkName = username.getText().toString();
+			  			String checkPass = password.getText().toString();
+			  			
+			  			boolean LoginCheck = LoginPost(checkName, checkPass);
+			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
+			  			if(LoginCheck == true)
+			  			{
+			  				//Username exists and is correct! Go to game
+			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
+							startActivity(new Intent(MainActivity.this, GameActivity.class));
+			  			}
+			  			else
+			  			{
+			  				//username doesn't exist or was input wrong, return area
+			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
+			  			}
+			  			
+			  		}
+					
+					
 					 
 				}
 				catch (Exception e) {
@@ -118,6 +139,50 @@ public class MainActivity extends Activity {
 				}
 				
 			}
+			
+			public boolean LoginPost(String username, String password)throws URISyntaxException, JsonGenerationException, JsonMappingException, IOException{
+		
+				// Create HTTP client
+				HttpClient client = new DefaultHttpClient();
+				// Construct URI
+
+				String uri = "http://10.0.2.2/login";
+				
+				//loginPost getPost = new loginPost();
+				
+				// Create a Login object containing the username and password
+				Login login = new Login();
+				login.setUsername(username);
+				login.setPassword(password);
+				
+				// Encode the Login object's data as JSON
+				StringWriter sw = new StringWriter();
+				JSON.getObjectMapper().writeValue(sw, login);
+			
+				// Create a POST request containing the JSON-encoded Login object
+				StringEntity reqEntity = new StringEntity(sw.toString());
+				reqEntity.setContentType("application/json");
+				// Construct request
+				HttpPost request = new HttpPost(uri);
+				
+				// process request
+				request.setEntity(reqEntity);
+				
+				HttpResponse response = client.execute(request);
+				// Parse response
+				if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+					// Copy the response body to a string
+					HttpEntity entity = response.getEntity();
+					
+					return true;
+				}
+				else{	
+					return false;
+				}
+				
+			}
+			
+			
 		});
         
         // TODO: Set onClickListeners for buttons
@@ -137,6 +202,7 @@ public class MainActivity extends Activity {
 			}
 		});
         
+
         gameTestButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
