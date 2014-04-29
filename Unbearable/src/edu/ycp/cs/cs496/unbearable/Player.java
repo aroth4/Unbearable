@@ -14,7 +14,7 @@ public class Player extends Sprite {
 	private boolean falling;
 	private boolean worldMove;
 	private int localMove;
-	private static final int initialDY = 16;
+	private static final int initialDY = 17;
 
 	public Player(Resources res, int x, int y, int frameWidth, int frameHeight,
 			int fps, int fileID) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -15,6 +16,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import edu.ycp.cs.cs496.unbearable.model.Sprite;
 import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
 
 public class GamePanel extends SurfaceView implements Callback {
@@ -22,7 +24,6 @@ public class GamePanel extends SurfaceView implements Callback {
 	private GameThread mThread;
 	private Player player;
 	private ArrayList<Ledge> ledges = new ArrayList<Ledge>();
-	boolean ledgeDetected;
 	private static int wLoc; // world scroll location
 	private int loc;
 	private ArrayList<Integer> randomsX = new ArrayList<Integer>();
@@ -31,7 +32,8 @@ public class GamePanel extends SurfaceView implements Callback {
 	private int n;
 	boolean onGround;
 	boolean onLedge;
-	int highestLedge;
+	int currentLedge;
+	
 	//used to get screen size for different devices
 	WindowManager wm;
 	Display display;
@@ -59,7 +61,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
 		screenSize = new Point(display.getWidth(),display.getHeight() - statusBarHeight);
 		
-		groundLevel = screenSize.y - 74; //74 is bear height (64) plus 10 to set arbitrary ground level
+		groundLevel = screenSize.y - 10; //74 is bear height (64) plus 10 to set arbitrary ground level
 		
 		//width then height
 		/*player = new Player(getResources(), 10, screenSize.y - 74, 64, 64, 10,
@@ -67,21 +69,25 @@ public class GamePanel extends SurfaceView implements Callback {
 		player = new Player(getResources(), 10, 0, 64, 64, 10,
 			R.drawable.bear); //spawns bear at top of screen, so he falls to ground
 
-		ledgeDetected=false;
 		onGround = false;
 		onLedge = false;
-		highestLedge = -1;
+		currentLedge = -1;
 		
 		randomListX(n);
 		randomListY(n);
+		
+		//ledges from top to bottom
 		for (int i = 0; i < screenSize.y; i+= 64) {
 		ledges.add(new Ledge(getResources(), 0, 128 + i, 128, 32, 10,
 				R.drawable.ledge));
 		}
-		ledges.add(new Ledge(getResources(), 256, 192, 128, 32, 10,
-				R.drawable.ledge));
 		
-		//Add the ledges to array
+		//ledges on ground
+		for (int i = 0; i < 2000; i+= 128) { //arbitrary number 2000, for end of level
+			ledges.add(new Ledge(getResources(), i, groundLevel, 128, 32, 1, R.drawable.ledge));
+		}
+		
+		//random ledges
 		for(int i = 0; i < n; i++)
 		{
 			ledges.add(new Ledge(getResources(), randomsX.get(i), randomsY.get(i), 128, 32, 10,
@@ -136,7 +142,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		//Update player
 		player.updatePosition(System.currentTimeMillis());
 		//Check ledges
-		checkLedge();
+		checkCollision();
 		//Update scrolling
 		setUpdateWorld();
 		//Update ledges
@@ -145,8 +151,8 @@ public class GamePanel extends SurfaceView implements Callback {
 			Ledge ledge = ledges.get(i);
 			ledge.setX(ledge.getLeftX() + loc);
 		}
-		
 	}
+	
 	//Set scrolling
 	public void setUpdateWorld()
 	{
@@ -178,125 +184,118 @@ public class GamePanel extends SurfaceView implements Callback {
 		return wLoc;
 	}
 	
-public void checkLedge(){
-		
-		// Ground Level //
-		//if on ground level and Y is not changing, return -1 because player must be on ground
-		if (player.getY() == groundLevel && player.getJumping() == false && player.getFalling() == false) {
-			//if player is on the ground and neither jumping nor falling, return
-			//System.out.println("Player on Ground");
+	public void checkCollision() {
+		if (player.getBottomY() >  groundLevel) {
+			//if player's location is beyond the ground level,
+			//set player to ground level
+			player.setBottomY(groundLevel);
+			player.setFalling(false);
+			player.setDY(player.getInitialDY());
 			onLedge = false;
-			return;
-		} else if (player.getY() < groundLevel && player.getJumping() == false && player.getFalling() == false && highestLedge == -1) {
-			//if player is above ground level and neither jumping nor falling,
-			//since player is also NOT on a ledge, player should begin to fall
-			System.out.println("Player in the air, falling!");
+			onGround = true;
+		} else if (player.getJumping()) {
+			//if player is jumping
+			onGround = false;
+			onLedge = false;
+		} else if (!onGround && !onLedge && !player.getFalling()){
+			//if player is not on ground or ledge, and not falling,
+			//player should be falling
 			player.setFalling(true);
 			player.setDY(0);
-		} else if (player.getY() >= groundLevel && player.getFalling() == true) {
-			//if player is on or below ground level and falling, 
-			//player must have hit the ground, so set player's location to ground level
-			System.out.println("Player hit Ground");
-			player.setFalling(false);
-			onLedge = false;
-			player.setY(groundLevel);
-			player.setDY(player.getInitialDY());
-			highestLedge = -1;
-			return;
+		} else {
+			doCollision();
+		}
+	}
+	
+	public void doCollision() {
+		//check to see which ledges the player is within the X boundaries
+
+		ArrayList<Integer> detected = new ArrayList<Integer>();
+		for (int i = 0; i < ledges.size(); i++) {
+			if (checkLedgeBoundaries(i)) {
+				//check here to see if the detected ledge is under/at the ground level
+				//and if it is, don't include it, otherwise include it
+				if (ledges.get(i).getTopY() <= groundLevel) {
+					detected.add(i);
+				}
+			}
 		}
 		
-		//check for ledges
-		if (onLedge) {
-			if (player.getJumping() || player.getFalling()) {
-				onLedge = false;
-			} else {
-				//player is on a ledge, so check to see if the player is still within the X boundaries of the ledge
-				//if not, that means the player has walked off the ledge, so make player fall
-				if (highestLedge != -1) {
-					if ((player.getX() < ledges.get(highestLedge).getRightX() && player.getX() + 
-							player.getWidth() > ledges.get(highestLedge).getLeftX())) {
-						//if player is still within X boundaries, check Y of highest ledge
-						if (player.getBottomY() >= ledges.get(highestLedge).getTopY()) {
-							//if the player's Y is under the highest ledge, reset highest ledge and begin to fall
-							//player.setBottomY(ledges.get(highestLedge).getTopY());
-						} else {
-							player.setFalling(true);
-							player.setDY(0);
-							onLedge = false;
-						}
-					} else {
-						//player is not within X boundaries of ledge
-						highestLedge = -1;
+		//detected now has a list of all possible ledges the player may land on
+		
+		if (detected.size() == 0) {
+			//no possible ledges, so must land on ground
+			currentLedge = -1;
+		} else {
+			//possible ledges detected, calculate which ledge player should land on
+			currentLedge = -1;
+			//reset currentLedge to ground level to calculate for possible new ledge
+			for (int i = 0; i < detected.size(); i++) {
+				Ledge newLedge = ledges.get(detected.get(i));
+				//if within boundaries, check if this ledge is under the player
+				//and if so, continue to check all the ledges until
+				//the highest ledge still under the player is found
+				if (currentLedge == -1 && player.getBottomY() <= newLedge.getTopY()) {
+					//if ground level, and player is above/on this ledge,
+					//set currentLedge to this ledge
+					currentLedge = detected.get(i);
+				} else if (currentLedge != -1 && newLedge.getTopY() < ledges.get(currentLedge).getTopY()) {
+					//if this new ledge is higher than the currently set ledge (and currentledge isn't ground),
+					//this is possibly the ledge that the player should land on, so check if the player is higher
+					//and set the new ledge as the current ledge
+					if (player.getBottomY() <= newLedge.getTopY()) {
+						currentLedge = detected.get(i);
 					}
 				}
 			}
-		} else if (!onGround && !onLedge) {
-			//if player is not on a ledge or on the ground, check the ledges
-			System.out.println("Begin to check each ledge");
-			synchronized(ledges) {
-				for (int i = 0; i < ledges.size(); i++) {
-					Ledge ledge = ledges.get(i);
-					System.out.println("Checking Ledge " + i);
-					//use this For loop ONLY to determine the ledge that the player would fall onto
-					if (player.getX() < ledge.getRightX() && player.getX() + player.getWidth() > ledge.getLeftX()
-							&& !player.getJumping()) {
-						//player is within the X boundaries of a ledge and NOT jumping and ABOVE ledge
-						System.out.println("Player is within X boundaries of ledge " + i);
-						
-						//check to see if player is above ledge, and if not, ignore ledge and go to the next ledge
-						if (player.getBottomY() < ledge.getTopY() && player.getFalling()) {
-							//player is above ledge and falling 
-							System.out.println("Player is above ledge " + i);
-							if (highestLedge != -1 && highestLedge != i) {
-							//if a ledge was detected previously, check to see if this new ledge is higher than old
-							//if higher, make player on top of it
-							//if lower, make player remain on previous ledge
-								System.out.println("A highest ledge was previously detected as " + highestLedge);
-								System.out.println("Current ledge being considered is ledge " + i);
-								
-								if (ledges.get(highestLedge).getTopY() > ledge.getTopY()) {
-									//if the previously highest ledge is lower than the newly detected ledge,
-									//make new ledge the detected ledge
-									//note: a greater Y value means it is LOWER
-									
-									System.out.println("Highest Ledge " + highestLedge + " Y: " + ledges.get(highestLedge).getTopY());
-									System.out.println("This Ledge " + i + " Y: " + ledges.get(i).getTopY());
-									highestLedge = i;
-									//System.out.println("New higher ledge set to " + i);
-								}
-								
-							} else {
-								//if a ledge was NOT previously detected, since this is the first ledge,
-								//make it the highest ledge
-								highestLedge = i;
-								System.out.println("No highest ledge set, so highest ledge is now " + i);
-							}
-						} else {
-							System.out.println("Player is NOT above ledge " + i);
-							if (highestLedge == i) {
-								System.out.println("Player has fallen off ledge " + i);
-								//highestLedge = -1;
-							}
-						}
-					} else {
-						System.out.println("Player is NOT within X boundaries of ledge " + i);
-					}
+		}
+		
+		//now, the ledge the player should land on has been calculated.
+		//if the player isn't on a ledge and isn't falling, make the player fall,
+		//and if/when the player lands on the calculated ledge, set falling to false and player's Y on ledge
+		
+		//calculate player's Y position
+		if(currentLedge != -1) {
+			if (player.getBottomY() + player.getDY() >= ledges.get(currentLedge).getTopY()) {
+				//if the player will surpass the current ledge in the next frame, set it on top of the ledge
+				player.setBottomY(ledges.get(currentLedge).getTopY());
+				player.setFalling(false);
+				player.setDY(player.getInitialDY());
+				onLedge = true;
+				onGround = false;
+			} else if (player.getBottomY() + player.getDY() < ledges.get(currentLedge).getTopY()) {
+				//if player is above ledge and will remain above the ledge in the next frame,
+				//let player continue to fall
+				if (!player.getFalling() && !player.getJumping()) {
+					//if player is not falling (and not jumping), make player fall
+					player.setFalling(true);
+					player.setDY(0);
+					onLedge = false;
+					onGround = false;
 				}
-				
 			}
-			System.out.println("Will land on ledge " + highestLedge);
-			if (highestLedge != -1) {
-				if (player.getBottomY() >= ledges.get(highestLedge).getTopY()) {
-					//player should be on ledge
-					player.setBottomY(ledges.get(highestLedge).getTopY());
-					player.setFalling(false);
-					player.setDY(player.getInitialDY());
-					onLedge = true;
-				}
+		} else {
+			if (!onGround && !player.getFalling()) {
+				//if currentLedge is ground, and if player is not on the ground and not falling,
+				//player should be falling
+				player.setFalling(true);
+				player.setDY(0);
 			}
 		}
 	}
-
+	
+	boolean checkLedgeBoundaries(int index) {
+		//safety check, shouldn't be called if on ground, but
+		//if on ground, do nothing;
+		//will cause out of bounds if it tries to check the -1 element
+		if (index > -1) {
+			Ledge ledge = ledges.get(index);
+			if ((player.getX() < ledge.getRightX() && player.getX() + player.getWidth() > ledge.getLeftX())) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public void doDraw(Canvas canvas, long elapsed) {
 		canvas.drawColor(Color.BLUE);
 		synchronized (ledges) {
@@ -304,6 +303,11 @@ public void checkLedge(){
 				ledge.doDraw(canvas);
 			}
 		}
+//		synchronized (land) {
+//			for (Sprite sprite : land) {
+//				sprite.doDraw(canvas);
+//			}
+//		}
 		
 		player.doDraw(canvas);
 
@@ -312,7 +316,7 @@ public void checkLedge(){
 				"Current Frame: " + player.getCurrentFrame()
 				+ ", X: " + player.getX() + ", Y: " + player.getY() 
 				+ ", ledgeLeft: " + ledges.get(0).getLeftX() + ", ledgeRight: " + ledges.get(0).getRightX()
-				+ ", ledgeDetected: " + ledgeDetected + ", " + wLoc
+				//+ ", ledgeDetected: " + ledgeDetected + ", " + wLoc
 				//+ ", screen height: " + screenSize.y +  ", screen width: " + screenSize.x
 				//+ ", Bitmap Width: " + player.getWidth() + ", Bitmap Height: " + player.getHeight()
 				//+ ", Center Width: " + player.getCenterX() + "Center Height: " + player.getCenterY()
@@ -341,9 +345,9 @@ public void checkLedge(){
 		}
 		
 		if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-			if (highestLedge != -1) {
+			if (currentLedge != -1) {
 				onLedge = false;
-				highestLedge = -1;
+				currentLedge = -1;
 				player.setFalling(true);
 				player.setDY(0);
 				player.setBottomY(player.getBottomY()+1);
@@ -358,6 +362,11 @@ public void checkLedge(){
 		//The way this is now has the bear's movement end if EITHER key is let go,
 		//even if the other key is still held down,
 		//so, not correct behavior
+		
+		if (keyCode == KeyEvent.KEYCODE_B) {
+			for (int i = 0; i < 40; i++)
+				System.out.println("DEBUG");
+		}
 		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 			player.setMoving(false);
 			return true;
