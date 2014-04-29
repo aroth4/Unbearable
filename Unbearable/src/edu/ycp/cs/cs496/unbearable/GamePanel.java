@@ -23,6 +23,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	private Player player;
 	private Background background;
 	private ArrayList<Ledge> ledges = new ArrayList<Ledge>();
+	private ArrayList<MenuItem> menus = new ArrayList<MenuItem>();
 	boolean ledgeDetected;
 	private static int wLoc; // world scroll location
 	private int loc;
@@ -32,8 +33,11 @@ public class GamePanel extends SurfaceView implements Callback {
 	private int n;
 	boolean onGround;
 	boolean onLedge;
+	boolean playSelected;
+	boolean quitSelected;
 	int highestLedge;
 	private int gameState = 1;
+	private float pX;
 	//used to get screen size for different devices
 	WindowManager wm;
 	Display display;
@@ -57,6 +61,9 @@ public class GamePanel extends SurfaceView implements Callback {
 		randy.setSeed(System.currentTimeMillis()+ 23489562);
 		wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		display = wm.getDefaultDisplay();
+		playSelected = false;
+		quitSelected = false;
+		pX = 0;
 
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
 		screenSize = new Point(display.getWidth(),display.getHeight() - statusBarHeight);
@@ -67,7 +74,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		/*player = new Player(getResources(), 10, screenSize.y - 74, 64, 64, 10,
 			R.drawable.bear);*/ //spawns bear on ground
 		background  = new Background(getResources(), 0, 0 + statusBarHeight, 2000, 400, 10, R.drawable.background);
-		player = new Player(getResources(), 10, 0, 64, 64, 10,
+		player = new Player(getResources(), 10, 0, 64, 64, 30,
 			R.drawable.bear); //spawns bear at top of screen, so he falls to ground
 		
 		ledgeDetected=false;
@@ -91,6 +98,12 @@ public class GamePanel extends SurfaceView implements Callback {
 				R.drawable.ledge));
 //		ledges.add(new Ledge(getResources(), 0, 192+64, 256, 64, 10,
 //				R.drawable.ledge));
+		
+		//Add the menu items
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.playgameunselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.playgameselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.quitgameunselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.quitgameselected));
 		
 		//Draw the ledges
 		for(int i = 0; i < n; i++)
@@ -148,21 +161,31 @@ public class GamePanel extends SurfaceView implements Callback {
 	}
 
 	public void update(long elapsedTime) {
-		//Update player
-		player.updatePosition(System.currentTimeMillis());
-		//Check ledges
-		checkLedge();
-		//Update scrolling
-		setUpdateWorld();
-		//Update ledges
-		
-		for(int i = 0; i < ledges.size(); i++)
+		if(gameState == 1)
 		{
-			Ledge ledge = ledges.get(i);
-			ledge.setX(ledge.getLeftX() + loc);
+			//checkMouseClick();
 		}
-		
-		background.setX(background.getLeftX() + loc);
+		if(gameState == 2){
+			
+			//Update player
+			player.updatePosition(System.currentTimeMillis());
+			//Check ledges
+			checkLedge();
+			//Update scrolling
+			setUpdateWorld();
+			//Update ledges
+			
+			for(int i = 0; i < ledges.size(); i++)
+			{
+				Ledge ledge = ledges.get(i);
+				ledge.setX(ledge.getLeftX() + loc);
+			}
+			
+			background.setX(background.getLeftX() + loc);
+		}
+		if(gameState == 3)
+		{
+		}
 		
 	}
 	//Set scrolling
@@ -335,21 +358,36 @@ public void checkLedge(){
 	}
 
 	public void doDraw(Canvas canvas, long elapsed) {
-		canvas.drawColor(Color.WHITE);
-		background.doDraw(canvas);
-		synchronized (ledges) {
-			for (Ledge ledge : ledges) {
-				ledge.doDraw(canvas);
-			}
+		canvas.drawColor(Color.CYAN);
+		if(gameState == 1)
+		{
+			if(playSelected == false)
+				menus.get(0).doDraw(canvas);
+			else
+				menus.get(1).doDraw(canvas);
+			if(quitSelected == false)
+				menus.get(2).doDraw(canvas);
+			else
+				menus.get(3).doDraw(canvas);
 		}
-		
-		player.doDraw(canvas);
+		if(gameState == 2)
+		{
+			background.doDraw(canvas);
+			synchronized (ledges) {
+				for (Ledge ledge : ledges) {
+					ledge.doDraw(canvas);
+				}
+			}
+			
+			player.doDraw(canvas);
+		}
 		// Debug information drawing
 		canvas.drawText(
 				"Current Frame: " + player.getCurrentFrame()
 				+ ", X: " + player.getX() + ", Y: " + player.getY() 
-				+ ", ledgeLeft: " + ledges.get(0).getLeftX() + ", ledgeRight: " + ledges.get(0).getRightX()
-				+ ", ledgeDetected: " + ledgeDetected + ", " + wLoc
+				+ ", SX: " + pX
+				//+ ", ledgeLeft: " + ledges.get(0).getLeftX() + ", ledgeRight: " + ledges.get(0).getRightX()
+				//+ ", ledgeDetected: " + ledgeDetected + ", " + wLoc
 				//+ ", screen height: " + screenSize.y +  ", screen width: " + screenSize.x
 				//+ ", Bitmap Width: " + player.getWidth() + ", Bitmap Height: " + player.getHeight()
 				//+ ", Center Width: " + player.getCenterX() + "Center Height: " + player.getCenterY()
@@ -410,9 +448,118 @@ public void checkLedge(){
 	public boolean onTouchEvent(MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			player.setMoving(!player.getMoving());
+			//DEBUG ME\/\/
+			pX = event.getX();
+			//Menu events
+			if(gameState == 1)
+			{
+				//Play
+				if(event.getX() >= screenSize.x/2 - 150 && event.getX() <= screenSize.x/2 + 150 
+						&& event.getY() <= screenSize.y/2 + 50 && event.getY() >= screenSize.y/2 - 50)
+				{
+					playSelected = true;
+					gameState = 2;
+					return true;
+				}
+				//Quit
+				if(event.getX() >= screenSize.x/2 - 150 && event.getX() <= screenSize.x/2 + 150 
+						&& event.getY() >= screenSize.y/2 - 50 && event.getY() <= screenSize.y/2 - 150)
+				{
+					quitSelected = true;
+					gameState = 2;
+					return true;
+				}
+
+				
+			}
+			else if(gameState == 2)
+			{
+				//Move the player
+				if(event.getX() < 300)
+				{
+					player.setMoving(true);
+					player.setOrientation(Orientation.LEFT);
+					//Jump bear, jump!
+					if(event.getY() <= 50)
+					{
+						if (player.getFalling() != true) {
+							player.setJumping(true);
+						}
+						return true;
+					}
+					//Fall bear, fall!
+					if(event.getY() >= screenSize.y - 100)
+					{
+						if (highestLedge != -1) {
+							onLedge = false;
+							highestLedge = -1;
+							player.setFalling(true);
+							player.setDY(0);
+							player.setBottomY(player.getBottomY()+1);
+							return true;
+						}
+					}
+					return true;
+				}
+				//Move the player the other way
+				if(event.getX() > screenSize.x - 300)
+				{
+					player.setMoving(true);
+					player.setOrientation(Orientation.RIGHT);
+					//Jump bear, jump!
+					if(event.getY() <= 50)
+					{
+						if (player.getFalling() != true) {
+							player.setJumping(true);
+						}
+						return true;
+					}
+					//Fall bear, fall!
+					if(event.getY() >= screenSize.y - 100)
+					{
+						if (highestLedge != -1) {
+							onLedge = false;
+							highestLedge = -1;
+							player.setFalling(true);
+							player.setDY(0);
+							player.setBottomY(player.getBottomY()+1);
+							return true;
+						}
+					}
+					return true;
+					
+				}
+				//Jump bear, jump!
+				if(event.getY() <= 50)
+				{
+					if (player.getFalling() != true) {
+						player.setJumping(true);
+					}
+					return true;
+				}
+				//Fall bear, fall!
+				if(event.getY() >= screenSize.y - 100)
+				{
+					if (highestLedge != -1) {
+						onLedge = false;
+						highestLedge = -1;
+						player.setFalling(true);
+						player.setDY(0);
+						player.setBottomY(player.getBottomY()+1);
+						return true;
+					}
+				}
+			}
+		case MotionEvent.ACTION_UP:
+			if(gameState == 2)
+			{
+				player.setMoving(false);
+				return true;
+			}
 		}
-		return true;
+		
+		return false;
+		
 	}
 	
 	public int getWorldMove(){
