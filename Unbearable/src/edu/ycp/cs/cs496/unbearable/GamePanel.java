@@ -35,6 +35,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	boolean onLedge;
 	boolean playSelected;
 	boolean quitSelected;
+	boolean gameWin;
 	int highestLedge;
 	private int gameState = 1;
 	private float pX;
@@ -63,6 +64,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		display = wm.getDefaultDisplay();
 		playSelected = false;
 		quitSelected = false;
+		gameWin = false;
 		pX = 0;
 
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
@@ -100,10 +102,10 @@ public class GamePanel extends SurfaceView implements Callback {
 //				R.drawable.ledge));
 		
 		//Add the menu items
-		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.playgameunselected));
-		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.playgameselected));
-		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.quitgameunselected));
-		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.quitgameselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameunselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameunselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameselected));
 		
 		//Draw the ledges
 		for(int i = 0; i < n; i++)
@@ -163,7 +165,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	public void update(long elapsedTime) {
 		if(gameState == 1)
 		{
-			//checkMouseClick();
+			//Don't need to update anything
 		}
 		if(gameState == 2){
 			
@@ -182,9 +184,18 @@ public class GamePanel extends SurfaceView implements Callback {
 			}
 			
 			background.setX(background.getLeftX() + loc);
+			
+			if(player.getX() >= 1500)
+			{
+				//Don't necessarily use boolean yet, but might if the win condition is item based
+				gameWin = true;
+				//Switch to game state for winning
+				gameState = 3;
+			}
 		}
 		if(gameState == 3)
 		{
+			//Don't need to update anything
 		}
 		
 	}
@@ -380,6 +391,10 @@ public void checkLedge(){
 			}
 			
 			player.doDraw(canvas);
+		}
+		if(gameState == 3)
+		{
+			
 		}
 		// Debug information drawing
 		canvas.drawText(
