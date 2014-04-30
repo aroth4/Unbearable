@@ -87,6 +87,12 @@ public class GamePanel extends SurfaceView implements Callback {
 		randomListX(n);
 		randomListY(n);
 		
+		//Add the menu items
+				menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameunselected));
+				menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameselected));
+				menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameunselected));
+				menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameselected));
+
 		//ledges from top to bottom
 		for (int i = 0; i < screenSize.y; i+= 64) {
 		ledges.add(new Ledge(getResources(), 0, 128 + i, 128, 32, 10,
