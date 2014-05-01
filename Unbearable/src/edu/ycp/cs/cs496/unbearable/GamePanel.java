@@ -46,7 +46,6 @@ public class GamePanel extends SurfaceView implements Callback {
 	int highestLedge;
 	private int gameState = 1;
 	private float pX;
-	int currentLedge;
 	
 
 	//used to get screen size for different devices

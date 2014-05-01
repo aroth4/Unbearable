@@ -3,7 +3,7 @@
     package="edu.ycp.cs.cs496.unbearable"
     android:versionCode="1"
     android:versionName="1.0" >
-
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="19" />
@@ -32,6 +32,7 @@
 		    android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="landscape" >
 		</activity>
+		
     </application>
-
+	
 </manifest>
