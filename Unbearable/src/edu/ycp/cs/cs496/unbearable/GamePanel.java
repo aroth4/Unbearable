@@ -197,7 +197,7 @@ public class GamePanel extends SurfaceView implements Callback {
 			//Update player
 			player.updatePosition(System.currentTimeMillis());
 			//Check ledges
-			doCollision();
+			checkCollision();
 			//Update scrolling
 			setUpdateWorld();
 			//Update ledges
