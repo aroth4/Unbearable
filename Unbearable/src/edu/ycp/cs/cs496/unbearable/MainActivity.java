@@ -13,6 +13,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -30,6 +31,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -78,6 +80,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 	    
 		//getActionBar only in API 11 and above,
@@ -123,34 +126,43 @@ public class MainActivity extends Activity {
 					// TODO: use web service to log in
 					
 					//GetLogin controller = new GetLogin();
-					EditText username = (EditText) findViewById(R.id.UsernameInput);
-			  		EditText password = (EditText) findViewById(R.id.PasswordInput);
+					final EditText username = (EditText) findViewById(R.id.UsernameInput);
+			  		final EditText password = (EditText) findViewById(R.id.PasswordInput);
 			  		if(IsEmpty(username) || IsEmpty(password))
 			  		{
 			  			Toast.makeText(MainActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
 			  		}
 			  		else
 			  		{
-			  			String checkName = username.getText().toString();
-			  			String checkPass = password.getText().toString();
-			  			
-			  			boolean LoginCheck = LoginPost(checkName, checkPass);
+			  		
 			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
-			  			if(LoginCheck == true)
-			  			{
-			  				//Username exists and is correct! Go to game
-			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
-							startActivity(new Intent(MainActivity.this, GameActivity.class));
+			  			new Thread(new Runnable(){
+			  				@Override
+			  				public void run() {
+			  					try{
+			  						String checkName = username.getText().toString();
+						  			String checkPass = password.getText().toString();
+			  						boolean LoginCheck = LoginPost(checkName, checkPass);
+			  						if(LoginCheck == true)
+						  			{
+						  				//Username exists and is correct! Go to game
+						  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
+										startActivity(new Intent(MainActivity.this, GameActivity.class));
+						  			}
+						  			else
+						  			{
+						  				//username doesn't exist or was input wrong, return area
+						  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
+						  			}
+			  					}catch (Exception ex){
+			  						ex.printStackTrace();
+			  					}
+			  					}
+			  				}).start();
 			  			}
-			  			else
-			  			{
-			  				//username doesn't exist or was input wrong, return area
-			  				Toast.makeText(MainActivity.this, "Username/Password incorrect or does not exist", Toast.LENGTH_SHORT).show();
-			  			}
+			  			
 			  			
 			  		}
-					 
-				}
 				catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -165,6 +177,8 @@ public class MainActivity extends Activity {
 
 				String uri = "http://10.0.2.2/login";
 				
+				//URI uri = URIUtils.createURI("http", "10.0.2.2", 8081, "/login/", 
+					  //  null, null);
 				//loginPost getPost = new loginPost();
 				
 				// Create a Login object containing the username and password
@@ -191,9 +205,11 @@ public class MainActivity extends Activity {
 					// Copy the response body to a string
 					HttpEntity entity = response.getEntity();
 					
+					System.out.println("Login Success");
 					return true;
 				}
 				else{	
+					System.out.println("Login Failed");
 					return false;
 				}
 				
