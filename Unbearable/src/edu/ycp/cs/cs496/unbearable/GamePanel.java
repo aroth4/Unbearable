@@ -16,6 +16,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import edu.ycp.cs.cs496.unbearable.Enemy.EnemyClass;
 import edu.ycp.cs.cs496.unbearable.model.Sprite;
 import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
 
@@ -36,6 +37,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	boolean onGround;
 	boolean onLedge;
 	int currentLedge;
+	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	
 	boolean playSelected;
 	boolean quitSelected;
@@ -77,31 +79,34 @@ public class GamePanel extends SurfaceView implements Callback {
 		//width then height
 		/*player = new Player(getResources(), 10, screenSize.y - 74, 64, 64, 10,
 			R.drawable.bear);*/ //spawns bear on ground
-		background  = new Background(getResources(), 0, 0 + statusBarHeight, 2000, 400, 10, R.drawable.background);
+		background  = new Background(getResources(), 0, 0, 0, 0, 10, R.drawable.background);
 		player = new Player(getResources(), 10, 0, 64, 64, 30,
 			R.drawable.bear); //spawns bear at top of screen, so he falls to ground
 		onGround = false;
 		onLedge = false;
 		currentLedge = -1;
 		
+		//Enemies
+		enemies.add(new Enemy(getResources(), 100, 99, 64, 64, 30, R.drawable.shark_fin, EnemyClass.SHARK));
 		randomListX(n);
 		randomListY(n);
 		
 		//Add the menu items
-				menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameunselected));
-				menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameselected));
-				menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameunselected));
-				menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameunselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameunselected));
+		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameselected));
 
 		//ledges from top to bottom
 		for (int i = 0; i < screenSize.y; i+= 64) {
-		ledges.add(new Ledge(getResources(), 0, 128 + i, 128, 32, 10,
-				R.drawable.ledge));
+			ledges.add(new Ledge(getResources(), 0, 128 + i, 128, 32, 10, R.drawable.ledge));
 		}
 		
 		//ledges on ground
 		for (int i = 0; i < 2000; i+= 128) { //arbitrary number 2000, for end of level
-			ledges.add(new Ledge(getResources(), i, groundLevel, 128, 32, 1, R.drawable.ledge));
+			if (i <= 128*3 || i >= 128*5) {
+				ledges.add(new Ledge(getResources(), i, groundLevel, 128, 32, 1, R.drawable.ledge));
+			}
 		}
 		
 		//random ledges
@@ -110,6 +115,7 @@ public class GamePanel extends SurfaceView implements Callback {
 			ledges.add(new Ledge(getResources(), randomsX.get(i), randomsY.get(i), 128, 32, 10,
 					R.drawable.ledge));
 		}
+		
 
 		this.setFocusable(true);
 		this.requestFocus();
@@ -169,11 +175,16 @@ public class GamePanel extends SurfaceView implements Callback {
 			//Update scrolling
 			setUpdateWorld();
 			//Update ledges
-			
 			for(int i = 0; i < ledges.size(); i++)
 			{
 				Ledge ledge = ledges.get(i);
 				ledge.setX(ledge.getLeftX() + loc);
+			}
+			//Update enemies
+			for(int i = 0; i < enemies.size(); i++)
+			{
+				enemies.get(i).updatePosition(elapsedTime);
+				enemies.get(i).setX(enemies.get(i).getX() + loc);
 			}
 			
 			background.setX(background.getLeftX() + loc);
@@ -215,15 +226,19 @@ public class GamePanel extends SurfaceView implements Callback {
 		return wLoc;
 	}
 	
+	public void setPlayerToGround() {
+		player.setBottomY(groundLevel);
+		player.setFalling(false);
+		player.setDY(player.getInitialDY());
+		onLedge = false;
+		onGround = true;
+	}
+	
 	public void checkCollision() {
 		if (player.getBottomY() >  groundLevel) {
 			//if player's location is beyond the ground level,
 			//set player to ground level
-			player.setBottomY(groundLevel);
-			player.setFalling(false);
-			player.setDY(player.getInitialDY());
-			onLedge = false;
-			onGround = true;
+			setPlayerToGround();
 		} else if (player.getJumping()) {
 			//if player is jumping
 			onGround = false;
@@ -233,6 +248,8 @@ public class GamePanel extends SurfaceView implements Callback {
 			//player should be falling
 			player.setFalling(true);
 			player.setDY(0);
+			onLedge = false;
+			onGround = false;
 		} else {
 			doCollision();
 		}
@@ -327,6 +344,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 		return false;
 	}
+	
 	public void doDraw(Canvas canvas, long elapsed) {
 		canvas.drawColor(Color.CYAN);
 		if(gameState == 1)
@@ -351,6 +369,11 @@ public class GamePanel extends SurfaceView implements Callback {
 			}
 			
 			player.doDraw(canvas);
+			
+			for (int i = 0; i < enemies.size(); i++)
+			{
+				enemies.get(i).doDraw(canvas);
+			}
 		}
 		// Debug information drawing
 		canvas.drawText(
@@ -391,8 +414,8 @@ public class GamePanel extends SurfaceView implements Callback {
 			if (currentLedge != -1) {
 				onLedge = false;
 				currentLedge = -1;
+				if (!player.getFalling()) {player.setDY(0); }
 				player.setFalling(true);
-				player.setDY(0);
 				player.setBottomY(player.getBottomY()+1);
 				return true;
 			}
@@ -406,10 +429,6 @@ public class GamePanel extends SurfaceView implements Callback {
 		//even if the other key is still held down,
 		//so, not correct behavior
 		
-		if (keyCode == KeyEvent.KEYCODE_B) {
-			for (int i = 0; i < 40; i++)
-				System.out.println("DEBUG");
-		}
 		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 			player.setMoving(false);
 			return true;
