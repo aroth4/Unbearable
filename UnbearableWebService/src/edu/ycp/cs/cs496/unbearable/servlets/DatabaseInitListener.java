@@ -18,6 +18,7 @@ public class DatabaseInitListener implements ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent e) {
 		// Webapp is shutting down
+		System.out.println("webapp is shut down");
 	}
 
 }
