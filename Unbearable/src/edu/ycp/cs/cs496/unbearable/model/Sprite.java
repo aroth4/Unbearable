@@ -36,10 +36,21 @@ public class Sprite {
 	public Sprite(Resources res, int x, int y, int frameWidth, int frameHeight,
 			int fps, int fileID) {
 		bitmap = BitmapFactory.decodeResource(res, fileID);
-		this.frameWidth = frameWidth;
-		this.frameHeight = frameHeight;
-		frameNumber = (bitmap.getWidth() / frameWidth)
-				* (bitmap.getHeight() / frameHeight);
+		
+		if (frameWidth == 0) {
+			this.frameWidth = bitmap.getWidth();
+		} else {
+			this.frameWidth = frameWidth;
+		}
+		
+		if (frameHeight == 0) {
+			this.frameHeight = bitmap.getHeight();
+		} else {
+			this.frameHeight = frameHeight;
+		}
+		
+		frameNumber = (bitmap.getWidth() / this.frameWidth)
+				* (bitmap.getHeight() / this.frameHeight);
 		orientation = Orientation.LEFT;
 
 		currentFrame = 0;
