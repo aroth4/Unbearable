@@ -459,14 +459,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 		
 		if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-			if (currentLedge != -1) {
-				onLedge = false;
-				currentLedge = -1;
-				player.setFalling(true);
-				player.setDY(0);
-				player.setBottomY(player.getBottomY()+1);
-				return true;
-			}
+			FallBearFall();
 		}
 		return false;
 	}
@@ -538,14 +531,7 @@ public class GamePanel extends SurfaceView implements Callback {
 					//Fall bear, fall!
 					if(event.getY() >= screenSize.y - 100)
 					{
-						if (highestLedge != -1) {
-							onLedge = false;
-							highestLedge = -1;
-							player.setFalling(true);
-							player.setDY(0);
-							player.setBottomY(player.getBottomY()+1);
-							return true;
-						}
+						FallBearFall();
 					}
 					return true;
 				}
@@ -565,14 +551,7 @@ public class GamePanel extends SurfaceView implements Callback {
 					//Fall bear, fall!
 					if(event.getY() >= screenSize.y - 100)
 					{
-						if (highestLedge != -1) {
-							onLedge = false;
-							highestLedge = -1;
-							player.setFalling(true);
-							player.setDY(0);
-							player.setBottomY(player.getBottomY()+1);
-							return true;
-						}
+						FallBearFall();
 					}
 					return true;
 					
@@ -588,14 +567,7 @@ public class GamePanel extends SurfaceView implements Callback {
 				//Fall bear, fall!
 				if(event.getY() >= screenSize.y - 100)
 				{
-					if (highestLedge != -1) {
-						onLedge = false;
-						highestLedge = -1;
-						player.setFalling(true);
-						player.setDY(0);
-						player.setBottomY(player.getBottomY()+1);
-						return true;
-					}
+					FallBearFall();
 				}
 			}
 		case MotionEvent.ACTION_UP:
@@ -614,4 +586,17 @@ public class GamePanel extends SurfaceView implements Callback {
 		return wLoc;
 	}
 
+
+	public boolean FallBearFall()
+	{
+		if (currentLedge != -1) {
+			onLedge = false;
+			currentLedge = -1;
+			player.setFalling(true);
+			player.setDY(0);
+			player.setBottomY(player.getBottomY()+1);
+			return true;
+		}
+		return false;
+	}
 }
