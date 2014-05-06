@@ -54,7 +54,8 @@ public class GamePanel extends SurfaceView implements Callback {
 	
 	//area constants 
 	private static int groundLevel;
-
+	GameActivity goBack;
+	
 	public GamePanel(Context context, int statusBarHeight) {
 		super(context);
 		getHolder().addCallback(this);
@@ -197,7 +198,7 @@ public class GamePanel extends SurfaceView implements Callback {
 			//Update player
 			player.updatePosition(System.currentTimeMillis());
 			//Check ledges
-			doCollision();
+			checkCollision();
 			//Update scrolling
 			setUpdateWorld();
 			//Update ledges
@@ -527,13 +528,11 @@ public class GamePanel extends SurfaceView implements Callback {
 				}
 				//Quit
 				if(event.getX() >= screenSize.x/2 - 150 && event.getX() <= screenSize.x/2 + 150 
-						&& event.getY() >= screenSize.y/2 - 50 && event.getY() <= screenSize.y/2 - 150)
+						&& event.getY() <= screenSize.y/2 + 200 && event.getY() >= screenSize.y/2 + 100)
 				{
 					quitSelected = true;
-					gameState = 2;
 					return true;
 				}
-
 				
 			}
 			else if(gameState == 2)
@@ -580,7 +579,7 @@ public class GamePanel extends SurfaceView implements Callback {
 					
 				}
 				//Jump bear, jump!
-				if(event.getY() <= 50)
+				if(event.getY() <= screenSize.y/8	)
 				{
 					if (player.getFalling() != true) {
 						player.setJumping(true);
@@ -588,7 +587,7 @@ public class GamePanel extends SurfaceView implements Callback {
 					return true;
 				}
 				//Fall bear, fall!
-				if(event.getY() >= screenSize.y - 100)
+				if(event.getY() >= screenSize.y - screenSize.y/6)
 				{
 					FallBearFall();
 				}

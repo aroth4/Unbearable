@@ -43,7 +43,7 @@ import edu.ycp.cs.cs496.unbearable.util.SystemUiHider;
  * 
  * @see SystemUiHider
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity  {
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -134,9 +134,14 @@ public class MainActivity extends Activity {
 			  			String checkName = username.getText().toString();
 			  			String checkPass = password.getText().toString();
 			  			
-			  			boolean LoginCheck = LoginPost(checkName, checkPass);
+			  			new AsyncPost().execute(checkName, checkPass);
+			  			boolean check;
+			  			check = false;
+			  			check = AsyncPost.checkLogin;
+			  			Thread.sleep(200);
+			  			System.out.println(check);
 			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
-			  			if(LoginCheck == true)
+			  			if(check == true)
 			  			{
 			  				//Username exists and is correct! Go to game
 			  				Toast.makeText(MainActivity.this, "Login Successful! Time to game!", Toast.LENGTH_SHORT).show();
@@ -157,49 +162,7 @@ public class MainActivity extends Activity {
 				
 			}
 			
-			public boolean LoginPost(String username, String password)throws URISyntaxException, JsonGenerationException, JsonMappingException, IOException{
-		
-				// Create HTTP client
-				HttpClient client = new DefaultHttpClient();
-				// Construct URI
 
-				String uri = "http://10.0.2.2/login";
-				
-				//loginPost getPost = new loginPost();
-				
-				// Create a Login object containing the username and password
-				Login login = new Login();
-				login.setUsername(username);
-				login.setPassword(password);
-				
-				// Encode the Login object's data as JSON
-				StringWriter sw = new StringWriter();
-				JSON.getObjectMapper().writeValue(sw, login);
-			
-				// Create a POST request containing the JSON-encoded Login object
-				StringEntity reqEntity = new StringEntity(sw.toString());
-				reqEntity.setContentType("application/json");
-				// Construct request
-				HttpPost request = new HttpPost(uri);
-				
-				// process request
-				request.setEntity(reqEntity);
-				
-				HttpResponse response = client.execute(request);
-				// Parse response
-				if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-					// Copy the response body to a string
-					HttpEntity entity = response.getEntity();
-					
-					return true;
-				}
-				else{	
-					return false;
-				}
-				
-			}
-			
-			
 
 		});
         

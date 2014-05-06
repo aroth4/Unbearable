@@ -20,11 +20,11 @@ private List<Login> LoginList;
 		//Check for existing login
 		for(Login login : LoginList)
 		{
-			if (login.getName().equals(username)) {
+			if (login.getUsername().equals(username)) {
 				if (login.getPassword().equals(password))
 				{
 				//return a copy
-				return new Login(login.getName(), login.getPassword());
+				return new Login(login.getUsername(), login.getPassword());
 				}
 			}
 		}
@@ -37,7 +37,7 @@ private List<Login> LoginList;
 		boolean result = false;
 		//Check to make sure
 		for (Login login: LoginList){
-			if (login.getName().equals(username) && login.getPassword().equals(password)){
+			if (login.getUsername().equals(username) && login.getPassword().equals(password)){
 				result = true;
 				break;
 			}
