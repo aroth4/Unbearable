@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.ycp.cs.cs496.unbearable.model.Login;
 import edu.ycp.cs.cs496.unbearable.model.json.JSON;
@@ -11,11 +13,14 @@ import edu.ycp.cs.cs496.unbearable.model.json.JSON;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -174,32 +179,45 @@ public class MainActivity extends Activity {
 				// Create HTTP client
 				HttpClient client = new DefaultHttpClient();
 				// Construct URI
+				
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				params.add(new BasicNameValuePair("user", username));
+				params.add(new BasicNameValuePair("pass", password));
+				
+				URI uri;
+				uri = URIUtils.createURI("http", "10.0.2.2", 8081, "/login/", URLEncodedUtils.format(params, "UTF-8"), null);
 
-				String uri = "http://10.0.2.2/login";
+//				String uri = "http://10.0.2.2/login";
 				
 				//URI uri = URIUtils.createURI("http", "10.0.2.2", 8081, "/login/", 
 					  //  null, null);
 				//loginPost getPost = new loginPost();
 				
 				// Create a Login object containing the username and password
-				Login login = new Login();
-				login.setUsername(username);
-				login.setPassword(password);
-				
-				// Encode the Login object's data as JSON
-				StringWriter sw = new StringWriter();
-				JSON.getObjectMapper().writeValue(sw, login);
-			
-				// Create a POST request containing the JSON-encoded Login object
-				StringEntity reqEntity = new StringEntity(sw.toString());
-				reqEntity.setContentType("application/json");
+//				Login login = new Login();
+//				login.setUsername(username);
+//				login.setPassword(password);
+//				
+//				// Encode the Login object's data as JSON
+//				StringWriter sw = new StringWriter();
+//				JSON.getObjectMapper().writeValue(sw, login);
+//			
+//				// Create a POST request containing the JSON-encoded Login object
+//				StringEntity reqEntity = new StringEntity(sw.toString());
+//				reqEntity.setContentType("application/json");
 				// Construct request
 				HttpPost request = new HttpPost(uri);
 				
-				// process request
-				request.setEntity(reqEntity);
-				
+//				// process request
+//				request.setEntity(reqEntity);
+//				System.out.println("Gets here");
+//				System.out.println(request.getEntity());
+
 				HttpResponse response = client.execute(request);
+
+				System.out.println("Response: ");
+				System.out.println(response.getStatusLine());
+
 				// Parse response
 				if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 					// Copy the response body to a string

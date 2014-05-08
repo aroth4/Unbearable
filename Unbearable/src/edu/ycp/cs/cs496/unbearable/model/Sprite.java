@@ -177,4 +177,9 @@ public class Sprite {
 	public void setOrientation(Orientation orientation) {
 		this.orientation = orientation;
 	}
+
+	public int getFrameNumber() {
+		// TODO Auto-generated method stub
+		return frameNumber;
+	}
 }
