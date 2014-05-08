@@ -138,7 +138,7 @@ public class MainActivity extends Activity  {
 			  			boolean check;
 			  			check = false;
 			  			check = AsyncPost.checkLogin;
-			  			Thread.sleep(200);
+//			  			Thread.sleep(200);
 			  			System.out.println(check);
 			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
 			  			if(check == true)
