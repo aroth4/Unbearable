@@ -134,11 +134,11 @@ public class MainActivity extends Activity  {
 			  			String checkName = username.getText().toString();
 			  			String checkPass = password.getText().toString();
 			  			
-//			  			new AsyncPost().execute(checkName, checkPass);
+			  			new AsyncPost().execute(checkName, checkPass);
 			  			boolean check;
 			  			check = false;
-//			  			check = AsyncPost.checkLogin;
-			  			Thread.sleep(200);
+			  			check = AsyncPost.checkLogin;
+//			  			Thread.sleep(200);
 			  			System.out.println(check);
 			  			//Toast.makeText(MainActivity.this, checkName + checkPass, Toast.LENGTH_SHORT).show();
 			  			if(check == true)
