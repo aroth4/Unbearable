@@ -40,7 +40,7 @@ public class Login {
 	 * 
 	 * @return the item name.
 	 */
-	public String getName() {
+	public String getUsername() {
 		return username;
 	}
 	

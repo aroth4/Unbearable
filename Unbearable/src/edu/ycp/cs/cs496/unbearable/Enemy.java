@@ -47,6 +47,11 @@ public class Enemy extends Sprite {
 		if (enemyClass == EnemyClass.SHARK) {
 			moving = true;
 			setCurrentFrame(4);	
+//			setTrueTopY(20);
+//			setTrueLeftX(10);
+//			setTrueRightX((int)getWidth()-7);
+//			setTrueBottomY((int)getHeight()-6);
+			
 		} else if (enemyClass == EnemyClass.PENGUIN) {
 			
 		} else {

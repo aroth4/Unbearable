@@ -20,7 +20,7 @@ public class RegistrationServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		Login login = JSON.getObjectMapper().readValue(req.getReader(), Login.class);
-		String userName = login.getName();
+		String userName = login.getUsername();
 		String password = login.getPassword();
 		
 		

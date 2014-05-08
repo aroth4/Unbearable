@@ -26,7 +26,6 @@ public class GamePanel extends SurfaceView implements Callback {
 	private Player player;
 	private Background background;
 	private ArrayList<Ledge> ledges = new ArrayList<Ledge>();
-	
 	private ArrayList<MenuItem> menus = new ArrayList<MenuItem>();
 	
 	boolean ledgeDetected;
@@ -42,10 +41,14 @@ public class GamePanel extends SurfaceView implements Callback {
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	
 	Sprite sharkAttack;
+	Sprite playerDead;
+	Sprite bigMama;
 	
-	boolean playSelected;
-	boolean quitSelected;
-	boolean gameWin;
+	private boolean playSelected;
+	private boolean quitSelected;
+	private boolean gameWin;
+	private boolean gameLose;
+	boolean hugMama;
 	int highestLedge;
 	private int gameState = 1;
 	private float pX;
@@ -53,7 +56,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	private int poolStart = 2; //ledge removed to start pool
 	private int poolEnd = 5; //ledge removed to end pool
 	
-	private boolean gameOver;
+	
 	
 
 	//used to get screen size for different devices
@@ -63,7 +66,8 @@ public class GamePanel extends SurfaceView implements Callback {
 	
 	//area constants 
 	private static int groundLevel;
-
+	GameActivity goBack;
+	
 	public GamePanel(Context context, int statusBarHeight) {
 		super(context);
 		getHolder().addCallback(this);
@@ -82,8 +86,9 @@ public class GamePanel extends SurfaceView implements Callback {
 		playSelected = false;
 		quitSelected = false;
 		gameWin = false;
+		gameLose = false;
+		hugMama = false;
 		pX = 0;
-		gameOver = false;
 
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
 		screenSize = new Point(display.getWidth(),display.getHeight() - statusBarHeight);
@@ -96,27 +101,23 @@ public class GamePanel extends SurfaceView implements Callback {
 		background  = new Background(getResources(), 0, 0, 0, 0, 10, R.drawable.background);
 		player = new Player(getResources(), 10, 0, 64, 64, 30,
 			R.drawable.bear); //spawns bear at top of screen, so he falls to ground
+		playerDead = new Sprite(getResources(), 100, 100, 64, 64, 10, R.drawable.bearbedead);
 		
+		bigMama = new Sprite(getResources(), 1500, 0, 0, 0, 10, R.drawable.motherofbear);
+		bigMama.setBottomY(screenSize.y);
 		ledgeDetected=false;
 
 		onGround = false;
 		onLedge = false;
 		highestLedge = -1;
 		currentLedge = -1;
-		
+
 		//Enemies
 		enemies.add(new Enemy(getResources(), 532, screenSize.y-42, 64, 64, 30, R.drawable.shark_fin, EnemyClass.SHARK));
 		sharkAttack = new Sprite(getResources(), 100, 100, 256, 128, 10, R.drawable.shark_attack);
 		
 		randomListX(n);
 		randomListY(n);
-		
-		//Add the menu items
-		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameunselected));
-		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameselected));
-		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameunselected));
-		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 + 50, 300, 100, 30, R.drawable.quitgameselected));
-
 
 		ledges.add(new Ledge(getResources(), 0, 64, 128, 32, 10,
 				R.drawable.ledge));
@@ -203,13 +204,15 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 		if(gameState == 2){
 
-			if (!gameOver) {
+			if (!gameLose) {
 				//Update player
 				player.updatePosition(System.currentTimeMillis());
 				//Check ledges
 				checkCollision();
 				//Update scrolling
 				setUpdateWorld();
+				//Update End Reward Sprite
+				updateMama();
 				//Update ledges
 				for(int i = 0; i < ledges.size(); i++)
 				{
@@ -232,16 +235,22 @@ public class GamePanel extends SurfaceView implements Callback {
 			
 			background.setX(background.getLeftX() + loc);
 			
-			if(player.getX() >= 1500)
+			if(hugMama)
 			{
 				//Don't necessarily use boolean yet, but might if the win condition is item based
 				gameWin = true;
 				//Switch to game state for winning
-				gameState = 3;
+				gameState = 4;
 			}
 		}
 		if(gameState == 3)
 		{
+			//Game Lost
+			//Don't need to update anything
+		}
+		if(gameState == 4)
+		{
+			//Game Win
 			//Don't need to update anything
 		}
 	}
@@ -268,6 +277,13 @@ public class GamePanel extends SurfaceView implements Callback {
 		else{
 			wLoc = 0;
 			loc = 0;
+		}
+	}
+	
+	public void updateMama() {
+		bigMama.setX(bigMama.getX() + loc);
+		if (bigMama.getX() <= player.getX() && bigMama.getY() <= player.getY()) {
+			hugMama = true;
 		}
 	}
 	
@@ -373,25 +389,6 @@ public class GamePanel extends SurfaceView implements Callback {
 					onGround = false;
 				}
 				
-				
-				
-				//at this point, we have the highest ledge as ledgeDetected, so check if player is there
-				
-				
-				
-				//then, reset values maybe?
-				
-
-				//						//now check if player is going to be below ledge at next update
-				//						if (player.getBottomY() + player.getDY() >= ledges.get(ledgeDetected).getTopY()) {
-				//							//if player is going to fall through ledge at next update,
-				//							//set player to be on ledge, and stop falling
-				//							System.out.println("Player hit ledge " + i + ", now standing on it");
-				//							player.setFalling(false);
-				//							player.setDY(player.getInitialDY());
-				//							player.setBottomY(ledges.get(ledgeDetected).getTopY());
-				//						}
-				
 			}
 		} else {
 			if (!onGround && !player.getFalling()) {
@@ -410,16 +407,30 @@ public class GamePanel extends SurfaceView implements Callback {
 				player.getY() > enemy.getBottomY() ||
 				player.getX() > enemy.getRightX() ||
 				player.getRightX() < enemy.getX() ) {
+				
+//			if (player.getBottomY() < enemy.getTrueTopY() || 
+//					player.getY() > enemy.getTrueBottomY() ||
+//					player.getX() > enemy.getTrueRightX() ||
+//					player.getRightX() < enemy.getTrueLeftX() ) {
+				
 				//safe
 			} else {
 				//game over
+				playerDead.setX(player.getX());
+				playerDead.setY(player.getY());
+				playerDead.setFrameInitial(0);
+				playerDead.setFrameFinal(0);
+				playerDead.setCurrentFrame(0);
+				playerDead.setOrientation(player.getOrientation());
+				
 				sharkAttack.setX(enemy.getX()-128);
 				sharkAttack.setY(enemy.getY()-64);
 				sharkAttack.setFrameInitial(0);
 				sharkAttack.setFrameFinal(9);
 				sharkAttack.setCurrentFrame(0);
 				sharkAttack.setOrientation(enemy.getOrientation());
-				gameOver = true;
+				
+				gameLose = true;
 			}
 		}
 	}
@@ -450,7 +461,7 @@ public class GamePanel extends SurfaceView implements Callback {
 			else
 				menus.get(3).doDraw(canvas);
 		}
-		if(gameState == 2)
+		else if(gameState == 2)
 		{
 			background.doDraw(canvas);
 			synchronized (ledges) {
@@ -459,9 +470,9 @@ public class GamePanel extends SurfaceView implements Callback {
 				}
 			}
 			
-			player.doDraw(canvas);
 
-			if (gameOver) {
+			if (gameLose) {
+				playerDead.doDraw(canvas);
 				sharkAttack.doDraw(canvas);
 				if (sharkAttack.getCurrentFrame() >= 9) {
 					//stop animating, go to GameOver screen
@@ -470,20 +481,35 @@ public class GamePanel extends SurfaceView implements Callback {
 				} else {
 					if (sharkAttack.getCurrentFrame() >= sharkAttack.getFrameFinal() || sharkAttack.getCurrentFrame() < sharkAttack.getFrameInitial()) {
 						sharkAttack.setCurrentFrame(sharkAttack.getFrameInitial());
+					} else if (sharkAttack.getCurrentFrame() == 4) {
+						playerDead.setCurrentFrame(1);
+						playerDead.setFrameInitial(1);
+						playerDead.setFrameFinal(1);
+						sharkAttack.setCurrentFrame(sharkAttack.getCurrentFrame() + 1);
 					} else {
 						sharkAttack.setCurrentFrame(sharkAttack.getCurrentFrame() + 1);
 					}
 				}
+			} else if (gameWin){ 
+				//gameState = 4;
 			} else {
+				bigMama.doDraw(canvas);
+				player.doDraw(canvas);
 				for (int i = 0; i < enemies.size(); i++)
 				{
 					enemies.get(i).doDraw(canvas);
 				}
 			}
 		}
-		if(gameState == 3)
-		{
+		else if(gameState == 3)
+		{	//gameLose
 			
+		}
+		else if(gameState == 4)
+		{	//gameWin
+			
+		} else {
+			System.out.println("ERROR GAMESTATE");
 		}
 		
 		// Debug information drawing
@@ -526,7 +552,18 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 		
 		if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+
 			FallBearFall();
+
+			if (currentLedge != -1) {
+				onLedge = false;
+				currentLedge = -1;
+				if (!player.getFalling()) {player.setDY(0); }
+				player.setFalling(true);
+				player.setBottomY(player.getBottomY()+1);
+				return true;
+			}
+
 		}
 		return false;
 	}
@@ -567,13 +604,11 @@ public class GamePanel extends SurfaceView implements Callback {
 				}
 				//Quit
 				if(event.getX() >= screenSize.x/2 - 150 && event.getX() <= screenSize.x/2 + 150 
-						&& event.getY() >= screenSize.y/2 - 50 && event.getY() <= screenSize.y/2 - 150)
+						&& event.getY() <= screenSize.y/2 + 200 && event.getY() >= screenSize.y/2 + 100)
 				{
 					quitSelected = true;
-					gameState = 2;
 					return true;
 				}
-
 				
 			}
 			else if(gameState == 2)
@@ -620,7 +655,7 @@ public class GamePanel extends SurfaceView implements Callback {
 					
 				}
 				//Jump bear, jump!
-				if(event.getY() <= 50)
+				if(event.getY() <= screenSize.y/8	)
 				{
 					if (player.getFalling() != true) {
 						player.setJumping(true);
@@ -628,7 +663,7 @@ public class GamePanel extends SurfaceView implements Callback {
 					return true;
 				}
 				//Fall bear, fall!
-				if(event.getY() >= screenSize.y - 100)
+				if(event.getY() >= screenSize.y - screenSize.y/6)
 				{
 					FallBearFall();
 				}
