@@ -12,8 +12,6 @@ public class Enemy extends Sprite {
 	private boolean jumping;
 	private boolean falling;
 	private int xMin, xMax;
-	private int xLeftTrue, xRightTrue;
-	private int yTopTrue, yBottomTrue; //do later, more 'accurate' collision box
 	
 	public enum EnemyClass {
 		SHARK, ICICLE
@@ -49,7 +47,8 @@ public class Enemy extends Sprite {
 			setOrientation(Orientation.RIGHT);
 			setCurrentFrame(4);
 		} else if (enemyClass == EnemyClass.ICICLE) {
-			dY = 1;
+			dY = -1;
+			setCurrentFrame(0);
 		} else {
 			
 		}

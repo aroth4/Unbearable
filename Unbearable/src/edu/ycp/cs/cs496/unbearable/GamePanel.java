@@ -116,7 +116,10 @@ public class GamePanel extends SurfaceView implements Callback {
 
 		//Enemies
 		enemies.add(new Enemy(getResources(), 532, screenSize.y-42, 64, 64, 30, R.drawable.shark_fin, EnemyClass.SHARK));
-		enemies.add(new Enemy(getResources(), 532, 0, 0, 0, 30, R.drawable.icicle, EnemyClass.ICICLE));
+//		enemies.add(new Enemy(getResources(), 300, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
+//		enemies.add(new Enemy(getResources(), 400, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
+//		enemies.add(new Enemy(getResources(), 500, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
+//		enemies.add(new Enemy(getResources(), 600, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
 		sharkAttack = new Sprite(getResources(), 100, 100, 256, 128, 10, R.drawable.shark_attack);
 		
 		randomListX(n);
@@ -150,6 +153,10 @@ public class GamePanel extends SurfaceView implements Callback {
 		{
 			ledges.add(new Ledge(getResources(), randomsX.get(i), randomsY.get(i), 128, 32, 10,
 					R.drawable.ledge));
+		}
+		
+		for (int i = 0; i < 10; i++) {
+			enemies.add(new Enemy(getResources(), randomsX.get(i)+128, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
 		}
 
 		enemies.get(0).setXMax((128*poolEnd)-64);
@@ -409,6 +416,11 @@ public class GamePanel extends SurfaceView implements Callback {
 	public void doEnemyCollision() {
 		for (int i = 0; i < enemies.size(); i++) {
 			Enemy enemy = enemies.get(i); 
+			if (enemy.getEnemyClass() == EnemyClass.ICICLE) {
+				if (player.getRightX() + 64 >= enemy.getX()) {
+					enemy.setFalling(true);
+				}
+			}
 			if (player.getBottomY() < enemy.getY() || 
 				player.getY() > enemy.getBottomY() ||
 				player.getX() > enemy.getRightX() ||
@@ -435,6 +447,9 @@ public class GamePanel extends SurfaceView implements Callback {
 					playerDead.setFrameInitial(1);
 					playerDead.setFrameFinal(1);
 					playerDead.setCurrentFrame(1);
+					
+					enemy.setFrameInitial(0);
+					enemy.setFrameFinal(2);
 				}
 				gameLose = true;
 			}
@@ -499,7 +514,17 @@ public class GamePanel extends SurfaceView implements Callback {
 					}
 				} else if (enemies.get(killedByEnemy).getEnemyClass() == EnemyClass.ICICLE) {
 					//draw icicle-crash animation or something
-					gameState = 3;
+					enemies.get(killedByEnemy).doDraw(canvas);
+					if (enemies.get(killedByEnemy).getCurrentFrame() >= enemies.get(killedByEnemy).getFrameFinal()) {
+						//stop animating, go to GameOver screen
+						gameState = 3;
+					} else {
+						if (enemies.get(killedByEnemy).getCurrentFrame() >= enemies.get(killedByEnemy).getFrameFinal() || enemies.get(killedByEnemy).getCurrentFrame() < enemies.get(killedByEnemy).getFrameInitial()) {
+							enemies.get(killedByEnemy).setCurrentFrame(enemies.get(killedByEnemy).getFrameInitial());
+						} else {
+							enemies.get(killedByEnemy).setCurrentFrame(enemies.get(killedByEnemy).getCurrentFrame() + 1);
+						}
+					}
 				}
 			} else if (gameWin){ 
 				//gameState = 4;
