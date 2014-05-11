@@ -12,6 +12,8 @@ public class Enemy extends Sprite {
 	private boolean jumping;
 	private boolean falling;
 	private int xMin, xMax;
+	private int xLeftTrue, xRightTrue;
+	private int yTopTrue, yBottomTrue; //do later, more 'accurate' collision box
 	
 	public enum EnemyClass {
 		SHARK, PENGUIN
@@ -27,7 +29,7 @@ public class Enemy extends Sprite {
 		initialDX = dX;
 		dY = 10;
 		initialDY = dY;
-		speed = 10;
+		speed = 5;
 		moving = false;
 		jumping = false;
 		falling = false;
@@ -45,6 +47,11 @@ public class Enemy extends Sprite {
 		if (enemyClass == EnemyClass.SHARK) {
 			moving = true;
 			setCurrentFrame(4);	
+//			setTrueTopY(20);
+//			setTrueLeftX(10);
+//			setTrueRightX((int)getWidth()-7);
+//			setTrueBottomY((int)getHeight()-6);
+			
 		} else if (enemyClass == EnemyClass.PENGUIN) {
 			
 		} else {
@@ -68,7 +75,6 @@ public class Enemy extends Sprite {
 		//manual frame cycling because idk why
 		setFrameInitial(3);
 		setFrameFinal(6);
-		System.out.println(getCurrentFrame());
 		if (getCurrentFrame() >= getFrameFinal() || getCurrentFrame() < getFrameInitial()) {
 			setCurrentFrame(getFrameInitial());
 		} else {
@@ -138,5 +144,25 @@ public class Enemy extends Sprite {
 	
 	public void setFalling(boolean falling) {
 		this.falling = falling;
+	}
+	
+	public int getXMin() {
+		return xMin;
+	}
+	
+	public void setXMin(int xMin) {
+		this.xMin = xMin;
+	}
+	
+	public int getXMax() {
+		return xMax;
+	}
+	
+	public void setXMax(int xMax) {
+		this.xMax = xMax;
+	}
+	
+	public EnemyClass getEnemyClass() {
+		return this.enemyClass;
 	}
 }

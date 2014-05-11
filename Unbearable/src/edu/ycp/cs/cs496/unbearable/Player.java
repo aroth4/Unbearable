@@ -27,6 +27,16 @@ public class Player extends Sprite {
 		falling = false;
 		worldMove = false;
 		
+//		setTrueTopY(20);
+//		setTrueLeftX(10);
+//		setTrueRightX(frameWidth-7);
+//		setTrueBottomY(frameHeight-6);
+		
+		/*topY   = 20
+		leftX  = 10
+		rightX = 7
+		bottomY= 6*/
+		
 		setOrientation(Orientation.RIGHT); 
 	}
 
@@ -62,7 +72,6 @@ public class Player extends Sprite {
 				setX(getX() - speed + localMove*10 );
 			} else {
 				setX(getX() + speed + localMove*10 );
-
 			}
 		}
 
