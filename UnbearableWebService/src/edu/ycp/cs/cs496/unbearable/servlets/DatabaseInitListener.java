@@ -23,5 +23,6 @@ public class DatabaseInitListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent e) {
 		// Webapp is shutting down
 	}
+	/// the testing
 
 }
