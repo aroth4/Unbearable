@@ -68,6 +68,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	//area constants 
 	private static int groundLevel;
 	GameActivity goBack;
+	private Background gameover;
 	
 	public GamePanel(Context context, int statusBarHeight) {
 		super(context);
@@ -101,6 +102,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		/*player = new Player(getResources(), 10, screenSize.y - 74, 64, 64, 10,
 			R.drawable.bear);*/ //spawns bear on ground
 		background  = new Background(getResources(), 0, 0, 0, 0, 10, R.drawable.background);
+		gameover = new Background(getResources(), 0, 0, 0 ,0, 10, R.drawable.gameover);
 		player = new Player(getResources(), 10, 0, 64, 64, 30,
 			R.drawable.bear); //spawns bear at top of screen, so he falls to ground
 		playerDead = new Sprite(getResources(), 100, 100, 64, 64, 10, R.drawable.bearbedead);
@@ -539,7 +541,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 		else if(gameState == 3)
 		{	//gameLose
-			
+			gameover.doDraw(canvas);
 		}
 		else if(gameState == 4)
 		{	//gameWin
