@@ -49,6 +49,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	private boolean gameWin;
 	private boolean gameLose;
 	boolean hugMama;
+	int killedByEnemy;
 	int highestLedge;
 	private int gameState = 1;
 	private float pX;
@@ -89,6 +90,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		gameLose = false;
 		hugMama = false;
 		pX = 0;
+		killedByEnemy = -1;
 
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
 		screenSize = new Point(display.getWidth(),display.getHeight() - statusBarHeight);
@@ -114,6 +116,7 @@ public class GamePanel extends SurfaceView implements Callback {
 
 		//Enemies
 		enemies.add(new Enemy(getResources(), 532, screenSize.y-42, 64, 64, 30, R.drawable.shark_fin, EnemyClass.SHARK));
+		enemies.add(new Enemy(getResources(), 532, 0, 0, 0, 30, R.drawable.icicle, EnemyClass.ICICLE));
 		sharkAttack = new Sprite(getResources(), 100, 100, 256, 128, 10, R.drawable.shark_attack);
 		
 		randomListX(n);
@@ -247,11 +250,13 @@ public class GamePanel extends SurfaceView implements Callback {
 		{
 			//Game Lost
 			//Don't need to update anything
+			System.out.println("YOU LOST");
 		}
 		if(gameState == 4)
 		{
 			//Game Win
 			//Don't need to update anything
+			System.out.println("YOU WIN");
 		}
 	}
 	
@@ -302,10 +307,11 @@ public class GamePanel extends SurfaceView implements Callback {
 	}
 	
 	public void checkCollision() {
-		if (player.getBottomY() >  groundLevel) {
+		if (player.getBottomY()-64 >  groundLevel) {
 			//if player's location is beyond the ground level,
 			//set player to ground level
 			//setPlayerToGround();
+			gameState = 3;
 		} else if (player.getJumping()) {
 			//if player is jumping
 			onGround = false;
@@ -407,29 +413,29 @@ public class GamePanel extends SurfaceView implements Callback {
 				player.getY() > enemy.getBottomY() ||
 				player.getX() > enemy.getRightX() ||
 				player.getRightX() < enemy.getX() ) {
-				
-//			if (player.getBottomY() < enemy.getTrueTopY() || 
-//					player.getY() > enemy.getTrueBottomY() ||
-//					player.getX() > enemy.getTrueRightX() ||
-//					player.getRightX() < enemy.getTrueLeftX() ) {
-				
 				//safe
 			} else {
 				//game over
+				killedByEnemy = i;
 				playerDead.setX(player.getX());
 				playerDead.setY(player.getY());
-				playerDead.setFrameInitial(0);
-				playerDead.setFrameFinal(0);
-				playerDead.setCurrentFrame(0);
 				playerDead.setOrientation(player.getOrientation());
-				
-				sharkAttack.setX(enemy.getX()-128);
-				sharkAttack.setY(enemy.getY()-64);
-				sharkAttack.setFrameInitial(0);
-				sharkAttack.setFrameFinal(9);
-				sharkAttack.setCurrentFrame(0);
-				sharkAttack.setOrientation(enemy.getOrientation());
-				
+				if (enemy.getEnemyClass() == EnemyClass.SHARK) {
+					playerDead.setFrameInitial(0);
+					playerDead.setFrameFinal(0);
+					playerDead.setCurrentFrame(0);
+					
+					sharkAttack.setX(enemy.getX()-128);
+					sharkAttack.setY(enemy.getY()-64);
+					sharkAttack.setFrameInitial(0);
+					sharkAttack.setFrameFinal(9);
+					sharkAttack.setCurrentFrame(0);
+					sharkAttack.setOrientation(enemy.getOrientation());
+				} else if (enemy.getEnemyClass() == EnemyClass.ICICLE) {
+					playerDead.setFrameInitial(1);
+					playerDead.setFrameFinal(1);
+					playerDead.setCurrentFrame(1);
+				}
 				gameLose = true;
 			}
 		}
@@ -473,22 +479,27 @@ public class GamePanel extends SurfaceView implements Callback {
 
 			if (gameLose) {
 				playerDead.doDraw(canvas);
-				sharkAttack.doDraw(canvas);
-				if (sharkAttack.getCurrentFrame() >= 9) {
-					//stop animating, go to GameOver screen
-					gameState = 3;
-					
-				} else {
-					if (sharkAttack.getCurrentFrame() >= sharkAttack.getFrameFinal() || sharkAttack.getCurrentFrame() < sharkAttack.getFrameInitial()) {
-						sharkAttack.setCurrentFrame(sharkAttack.getFrameInitial());
-					} else if (sharkAttack.getCurrentFrame() == 4) {
-						playerDead.setCurrentFrame(1);
-						playerDead.setFrameInitial(1);
-						playerDead.setFrameFinal(1);
-						sharkAttack.setCurrentFrame(sharkAttack.getCurrentFrame() + 1);
+				if (enemies.get(killedByEnemy).getEnemyClass() == EnemyClass.SHARK) {
+					sharkAttack.doDraw(canvas);
+					if (sharkAttack.getCurrentFrame() >= 9) {
+						//stop animating, go to GameOver screen
+						gameState = 3;
+						
 					} else {
-						sharkAttack.setCurrentFrame(sharkAttack.getCurrentFrame() + 1);
+						if (sharkAttack.getCurrentFrame() >= sharkAttack.getFrameFinal() || sharkAttack.getCurrentFrame() < sharkAttack.getFrameInitial()) {
+							sharkAttack.setCurrentFrame(sharkAttack.getFrameInitial());
+						} else if (sharkAttack.getCurrentFrame() == 4) {
+							playerDead.setCurrentFrame(1);
+							playerDead.setFrameInitial(1);
+							playerDead.setFrameFinal(1);
+							sharkAttack.setCurrentFrame(sharkAttack.getCurrentFrame() + 1);
+						} else {
+							sharkAttack.setCurrentFrame(sharkAttack.getCurrentFrame() + 1);
+						}
 					}
+				} else if (enemies.get(killedByEnemy).getEnemyClass() == EnemyClass.ICICLE) {
+					//draw icicle-crash animation or something
+					gameState = 3;
 				}
 			} else if (gameWin){ 
 				//gameState = 4;

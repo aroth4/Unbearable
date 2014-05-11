@@ -16,7 +16,7 @@ public class Enemy extends Sprite {
 	private int yTopTrue, yBottomTrue; //do later, more 'accurate' collision box
 	
 	public enum EnemyClass {
-		SHARK, PENGUIN
+		SHARK, ICICLE
 	}
 	
 	EnemyClass enemyClass;
@@ -46,14 +46,10 @@ public class Enemy extends Sprite {
 	public void initialize() {
 		if (enemyClass == EnemyClass.SHARK) {
 			moving = true;
-			setCurrentFrame(4);	
-//			setTrueTopY(20);
-//			setTrueLeftX(10);
-//			setTrueRightX((int)getWidth()-7);
-//			setTrueBottomY((int)getHeight()-6);
-			
-		} else if (enemyClass == EnemyClass.PENGUIN) {
-			
+			setOrientation(Orientation.RIGHT);
+			setCurrentFrame(4);
+		} else if (enemyClass == EnemyClass.ICICLE) {
+			dY = 1;
 		} else {
 			
 		}
@@ -62,8 +58,8 @@ public class Enemy extends Sprite {
 	public void updatePosition(long elapsedTime) {
 		if (enemyClass == EnemyClass.SHARK) {
 			sharkBehavior();
-		} else if (enemyClass == EnemyClass.PENGUIN) {
-			//penguinBehavior();
+		} else if (enemyClass == EnemyClass.ICICLE) {
+			icicleBehavior();
 		} else {
 			
 		}
@@ -91,11 +87,16 @@ public class Enemy extends Sprite {
 				setOrientation(Orientation.LEFT);
 				setDX(-(initialDX));
 			}
-		} //else if (entering_water)
-		//exiting water
-		//attack
+		} 
 		
 		setX(getX() + dX);
+	}
+	
+	public void icicleBehavior() {
+		if (falling) {
+			setY(getY() + getDY());
+			setDY(getDY() + 1);
+		}
 	}
 	
 	public int getDX() {
