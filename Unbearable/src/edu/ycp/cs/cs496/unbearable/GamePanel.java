@@ -173,7 +173,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		//Set random points for x,y
 		for (int i=0; i<n; i++)
 		{
-		    randomsY.add(randy.nextInt(300));
+		    randomsY.add(randy.nextInt((480 - 180) + 1) + 180);
 		}
 		return randomsY;
 	}
