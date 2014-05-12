@@ -7,6 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/UnbearableModelClasses"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UnbearableControllers"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UnbearablePersistence"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CS496_Derby"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CS320_Derby"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
