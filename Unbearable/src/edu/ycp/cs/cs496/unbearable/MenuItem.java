@@ -1,8 +1,8 @@
 package edu.ycp.cs.cs496.unbearable;
 
-import android.content.res.Resources;
 import edu.ycp.cs.cs496.unbearable.model.Sprite;
 import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
+import android.content.res.Resources;
 
 public class MenuItem extends Sprite{
 
@@ -27,8 +27,6 @@ public class MenuItem extends Sprite{
 	public int getRightX() {
 		return (int) (this.getX() + this.getWidth());
 	}
-	
-
 	
 	public void setLeftX(int x) {
 		setX(x);

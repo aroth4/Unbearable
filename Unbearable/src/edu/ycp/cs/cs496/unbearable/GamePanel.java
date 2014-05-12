@@ -28,17 +28,19 @@ public class GamePanel extends SurfaceView implements Callback {
 	private ArrayList<Ledge> ledges = new ArrayList<Ledge>();
 	private ArrayList<MenuItem> menus = new ArrayList<MenuItem>();
 	
-	boolean ledgeDetected;
+	private boolean ledgeDetected;
 	private static int wLoc; // world scroll location
 	private int loc;
 	private ArrayList<Integer> randomsX = new ArrayList<Integer>();
 	private ArrayList<Integer> randomsY = new ArrayList<Integer>();
 	private Random randx, randy;
 	private int n;
-	boolean onGround;
-	boolean onLedge;
-	int currentLedge;
+	private boolean onGround;
+	private boolean onLedge;
+	private int currentLedge;
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	private ArrayList<Collectible> collectibles = new ArrayList<Collectible>();
+	private int fishCollected;
 	
 	Sprite sharkAttack;
 	Sprite playerDead;
@@ -48,18 +50,15 @@ public class GamePanel extends SurfaceView implements Callback {
 	private boolean quitSelected;
 	private boolean gameWin;
 	private boolean gameLose;
-	boolean hugMama;
-	int killedByEnemy;
-	int highestLedge;
+	private boolean hugMama;
+	private int killedByEnemy;
+	private int highestLedge;
 	private int gameState = 1;
 	private float pX;
 	
 	private int poolStart = 2; //ledge removed to start pool
 	private int poolEnd = 5; //ledge removed to end pool
 	
-	
-	
-
 	//used to get screen size for different devices
 	WindowManager wm;
 	Display display;
@@ -98,9 +97,6 @@ public class GamePanel extends SurfaceView implements Callback {
 		
 		groundLevel = screenSize.y - 10; //74 is bear height (64) plus 10 to set arbitrary ground level
 		
-		//width then height
-		/*player = new Player(getResources(), 10, screenSize.y - 74, 64, 64, 10,
-			R.drawable.bear);*/ //spawns bear on ground
 		background  = new Background(getResources(), 0, 0, 0, 0, 10, R.drawable.background);
 		gameover = new Background(getResources(), 0, 0, 0 ,0, 10, R.drawable.gameover);
 		player = new Player(getResources(), 10, 0, 64, 64, 30,
@@ -116,12 +112,8 @@ public class GamePanel extends SurfaceView implements Callback {
 		highestLedge = -1;
 		currentLedge = -1;
 
-		//Enemies
+		//Shark
 		enemies.add(new Enemy(getResources(), 532, screenSize.y-42, 64, 64, 30, R.drawable.shark_fin, EnemyClass.SHARK));
-//		enemies.add(new Enemy(getResources(), 300, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
-//		enemies.add(new Enemy(getResources(), 400, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
-//		enemies.add(new Enemy(getResources(), 500, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
-//		enemies.add(new Enemy(getResources(), 600, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
 		sharkAttack = new Sprite(getResources(), 100, 100, 256, 128, 10, R.drawable.shark_attack);
 		
 		randomListX(n);
@@ -130,10 +122,10 @@ public class GamePanel extends SurfaceView implements Callback {
 		ledges.add(new Ledge(getResources(), 0, 64, 128, 32, 10,
 				R.drawable.ledge));
 		
-		//ledges from top to bottom
-		for (int i = 0; i < screenSize.y; i+= 64) {
-			ledges.add(new Ledge(getResources(), 0, 128 + i, 128, 32, 10, R.drawable.ledge));
-		}
+		//ledges from top to bottom, debug ledges
+//		for (int i = 0; i < screenSize.y; i+= 64) {
+//			ledges.add(new Ledge(getResources(), 0, 128 + i, 128, 32, 10, R.drawable.ledge));
+//		}
 
 		//Add the menu items
 		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameunselected));
@@ -150,21 +142,24 @@ public class GamePanel extends SurfaceView implements Callback {
 			}
 		}
 		
+		
 		//random ledges
 		for(int i = 0; i < n; i++)
-		{
-			ledges.add(new Ledge(getResources(), randomsX.get(i), randomsY.get(i), 128, 32, 10,
-					R.drawable.ledge));
-		}
+			ledges.add(new Ledge(getResources(), randomsX.get(i), randomsY.get(i), 128, 32, 10, R.drawable.ledge));
 		
-		for (int i = 0; i < 10; i++) {
+		//random icicles
+		for (int i = 0; i < 10; i++)
 			enemies.add(new Enemy(getResources(), randomsX.get(i)+128, -10, 32, 71, 30, R.drawable.icicle, EnemyClass.ICICLE));
-		}
+		
+		//random collectibles on ground
+		for (int i = 0; i < 10; i++)
+			collectibles.add(new Collectible(getResources(), randomsX.get(i), screenSize.y-32, 0, 0, 30, R.drawable.fish));
+		
+		fishCollected = 0;
 
 		enemies.get(0).setXMax((128*poolEnd)-64);
 		enemies.get(0).setXMin((128*poolStart)+128);
 
-		this.setFocusable(true);
 		this.requestFocus();
 	}
 	
@@ -231,6 +226,7 @@ public class GamePanel extends SurfaceView implements Callback {
 					Ledge ledge = ledges.get(i);
 					ledge.setX(ledge.getLeftX() + loc);
 				}
+				
 				//Update enemies
 				doEnemyCollision();
 				for(int i = 0; i < enemies.size(); i++)
@@ -242,6 +238,12 @@ public class GamePanel extends SurfaceView implements Callback {
 						enemies.get(0).setXMax(enemies.get(0).getXMax()+loc);
 						enemies.get(0).setXMin(enemies.get(0).getXMin()+loc);
 					}
+				}
+				//Update collecibles
+				doCollectibleCollision();
+				for(int i = 0; i < collectibles.size(); i++)
+				{
+					collectibles.get(i).setX(collectibles.get(i).getX() + loc);
 				}
 			}
 			
@@ -269,9 +271,9 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 	}
 	
-	//Set scrolling
 	public void setUpdateWorld()
 	{
+		//Set scrolling
 		if(player.getX() <= 0)
 		{
 			wLoc = 1;
@@ -301,9 +303,9 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 	}
 	
-	//Get scrolling location
 	public static int getUpdateWorld()
 	{
+		//Get scrolling location
 		return wLoc;
 	}
 	
@@ -318,8 +320,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	public void checkCollision() {
 		if (player.getBottomY()-64 >  groundLevel) {
 			//if player's location is beyond the ground level,
-			//set player to ground level
-			//setPlayerToGround();
+			//this means he fell off the world! oh no, he dead
 			gameState = 3;
 		} else if (player.getJumping()) {
 			//if player is jumping
@@ -458,6 +459,22 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 	}
 	
+	public void doCollectibleCollision() {
+		for (int i = 0; i < collectibles.size(); i++) {
+			Collectible collectible = collectibles.get(i);
+			if (!collectible.getCollected()) {
+				//if not collected, check if player has collided with collectible
+				if (!(player.getBottomY() < collectible.getY() || 
+						player.getY() > collectible.getBottomY() ||
+						player.getX() > collectible.getRightX() ||
+						player.getRightX() < collectible.getX() )) {
+					collectible.setCollected(true);
+					fishCollected++;
+				}
+			}
+		}
+	}
+	
 	boolean checkLedgeBoundaries(int index) {
 		//safety check, shouldn't be called if on ground, but
 		//if on ground, do nothing;
@@ -493,7 +510,6 @@ public class GamePanel extends SurfaceView implements Callback {
 				}
 			}
 			
-
 			if (gameLose) {
 				playerDead.doDraw(canvas);
 				if (enemies.get(killedByEnemy).getEnemyClass() == EnemyClass.SHARK) {
@@ -515,7 +531,7 @@ public class GamePanel extends SurfaceView implements Callback {
 						}
 					}
 				} else if (enemies.get(killedByEnemy).getEnemyClass() == EnemyClass.ICICLE) {
-					//draw icicle-crash animation or something
+					//draw icicle-crash animation
 					enemies.get(killedByEnemy).doDraw(canvas);
 					if (enemies.get(killedByEnemy).getCurrentFrame() >= enemies.get(killedByEnemy).getFrameFinal()) {
 						//stop animating, go to GameOver screen
@@ -530,13 +546,17 @@ public class GamePanel extends SurfaceView implements Callback {
 				}
 			} else if (gameWin){ 
 				//gameState = 4;
+				//draw 'good' ending
 			} else {
 				bigMama.doDraw(canvas);
 				player.doDraw(canvas);
-				for (int i = 0; i < enemies.size(); i++)
-				{
-					enemies.get(i).doDraw(canvas);
+				for (int i = 0; i < collectibles.size(); i++) {
+					if (!collectibles.get(i).getCollected()) {
+						collectibles.get(i).doDraw(canvas);
+					}
 				}
+				for (int i = 0; i < enemies.size(); i++)
+					enemies.get(i).doDraw(canvas);
 			}
 		}
 		else if(gameState == 3)
@@ -608,10 +628,6 @@ public class GamePanel extends SurfaceView implements Callback {
 
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		//The way this is now has the bear's movement end if EITHER key is let go,
-		//even if the other key is still held down,
-		//so, not correct behavior
-		
 		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 			player.setMoving(false);
 			return true;

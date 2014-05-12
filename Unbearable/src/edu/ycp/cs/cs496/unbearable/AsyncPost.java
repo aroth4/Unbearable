@@ -77,12 +77,18 @@ public class AsyncPost extends AsyncTask<String, String, String>{
 		System.out.println("Response");
 		System.out.println(response.getStatusLine().getStatusCode());
 		// Parse response
+		HttpEntity entity = response.getEntity();
+		System.out.println("test: " + response.getEntity().toString());
 		if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 			// Copy the response body to a string
-			HttpEntity entity = response.getEntity();
-			System.out.println("SUCCESS");
-			checkLogin = true;
-			return true;
+			if (entity == null){
+				checkLogin = false;
+				return false;
+			}else{
+				System.out.println("SUCCESS");
+				checkLogin = true;
+				return true;	
+			}
 		}
 		else{	
 			System.out.println("FAILED");

@@ -4,6 +4,7 @@ import java.io.Console;
 
 import android.content.res.Resources;
 import edu.ycp.cs.cs496.unbearable.model.Sprite;
+import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
 
 public class Player extends Sprite {
 
@@ -26,16 +27,6 @@ public class Player extends Sprite {
 		jumping = false;
 		falling = false;
 		worldMove = false;
-		
-//		setTrueTopY(20);
-//		setTrueLeftX(10);
-//		setTrueRightX(frameWidth-7);
-//		setTrueBottomY(frameHeight-6);
-		
-		/*topY   = 20
-		leftX  = 10
-		rightX = 7
-		bottomY= 6*/
 		
 		setOrientation(Orientation.RIGHT); 
 	}
@@ -132,5 +123,4 @@ public class Player extends Sprite {
 		this.worldMove = worldMove;
 	}
 	
-
 }

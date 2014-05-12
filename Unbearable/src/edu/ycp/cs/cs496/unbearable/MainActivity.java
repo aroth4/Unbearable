@@ -87,13 +87,6 @@ public class MainActivity extends Activity  {
 	    	getActionBar().hide();	
 	    }
 	    
-		//getActionBar only in API 11 and above,
-		//so if API 10 or less, don't use it
-	    if (Build.VERSION.SDK_INT >= 11) {
-		    getActionBar().hide();
-
-	    }
-	    
 		setDefaultView();
 		
 	}

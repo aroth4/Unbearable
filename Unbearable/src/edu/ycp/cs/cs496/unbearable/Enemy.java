@@ -1,7 +1,8 @@
  package edu.ycp.cs.cs496.unbearable;
 
-import android.content.res.Resources;
 import edu.ycp.cs.cs496.unbearable.model.Sprite;
+import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
+import android.content.res.Resources;
 
 public class Enemy extends Sprite {
 
@@ -67,7 +68,6 @@ public class Enemy extends Sprite {
 	
 	public void sharkBehavior() {
 		//shark simply moves back and forth
-		//manual frame cycling because idk why
 		setFrameInitial(3);
 		setFrameFinal(6);
 		if (getCurrentFrame() >= getFrameFinal() || getCurrentFrame() < getFrameInitial()) {

@@ -1,6 +1,7 @@
 package edu.ycp.cs.cs496.unbearable;
 
 import edu.ycp.cs.cs496.unbearable.model.Sprite;
+import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
 import android.content.res.Resources;
 
 public class Background extends Sprite{
@@ -26,10 +27,6 @@ public class Background extends Sprite{
 	public int getRightX() {
 		return (int) (this.getX() + this.getWidth());
 	}
-	
-//	public static Ledge setLedge(Resources res, int x, int y, int frameWidth, int frameHeight, int fps, int fileID){
-//		return setLedge(res, x, y, frameWidth, frameHeight, fps, fileID);
-//	} 
 	
 	public void setLeftX(int x) {
 		setX(x);
