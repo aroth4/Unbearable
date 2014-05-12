@@ -17,30 +17,39 @@ public class LoginServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		
+		System.out.println("Received a login request!");
 
-		Login login = JSON.getObjectMapper().readValue(req.getReader(), Login.class);
-		String userName = login.getName();
-		String password = login.getPassword();
-		
-		// Use a controller to determine if this username/password corresponds to an existing user
-		GetLogin controller = new GetLogin();
-		login = controller.getLogin(userName, password);
-		
-		if (login == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			resp.setContentType("application/json");
-			JSON.getObjectMapper().writeValue(resp.getWriter(), (Boolean)false);
-		} else {
-			// The login succeeded: set information in the session to
-			// record the fact that the client successfully logged in
-			req.getSession().setAttribute("login", login);
+		try {
+			Login login = JSON.getObjectMapper().readValue(req.getReader(), Login.class);
+			String userName = login.getUsername();
+			String password = login.getPassword();
 			
-			// Set status code and content type
-			resp.setStatus(HttpServletResponse.SC_OK);
-			resp.setContentType("application/json");
-					
-			// Return the item in JSON format
-			JSON.getObjectMapper().writeValue(resp.getWriter(), (Boolean)true);
+			// Use a controller to determine if this username/password corresponds to an existing user
+			GetLogin controller = new GetLogin();
+			login = controller.getLogin(userName, password);
+			
+			if (login == null) {
+				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				resp.setContentType("application/json");
+				JSON.getObjectMapper().writeValue(resp.getWriter(), (Boolean)false);
+				System.out.println("Send back NOT_FOUND");
+			} else {
+				// The login succeeded: set information in the session to
+				// record the fact that the client successfully logged in
+				req.getSession().setAttribute("login", login);
+				
+				// Set status code and content type
+				resp.setStatus(HttpServletResponse.SC_OK);
+				resp.setContentType("application/json");
+						
+				// Return the item in JSON format
+				JSON.getObjectMapper().writeValue(resp.getWriter(), (Boolean)true);
+				System.out.println("Send back OK");
+			}
+		} catch (Throwable e) {
+			System.err.println("Unexpected exception:");
+			e.printStackTrace();
 		}
 	}
 }

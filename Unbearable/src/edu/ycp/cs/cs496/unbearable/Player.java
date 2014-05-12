@@ -14,7 +14,7 @@ public class Player extends Sprite {
 	private boolean falling;
 	private boolean worldMove;
 	private int localMove;
-	private static final int initialDY = 16;
+	private static final int initialDY = 17;
 
 	public Player(Resources res, int x, int y, int frameWidth, int frameHeight,
 			int fps, int fileID) {
@@ -27,7 +27,17 @@ public class Player extends Sprite {
 		falling = false;
 		worldMove = false;
 		
-		setOrientation(Orientation.RIGHT);
+//		setTrueTopY(20);
+//		setTrueLeftX(10);
+//		setTrueRightX(frameWidth-7);
+//		setTrueBottomY(frameHeight-6);
+		
+		/*topY   = 20
+		leftX  = 10
+		rightX = 7
+		bottomY= 6*/
+		
+		setOrientation(Orientation.RIGHT); 
 	}
 
 	public void updatePosition(long elapsedTime) {
@@ -58,14 +68,11 @@ public class Player extends Sprite {
 				setFrameFinal(4);
 			}
 
-			// cycle between frames 1 and 4
 			if (getOrientation() == Orientation.LEFT) {
 				setX(getX() - speed + localMove*10 );
 			} else {
 				setX(getX() + speed + localMove*10 );
-
 			}
-			//System.out.println(localMove);
 		}
 
 		if (jumping == false && falling == false && moving == false) {

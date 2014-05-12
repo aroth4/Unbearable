@@ -1,12 +1,26 @@
 package edu.ycp.cs.cs496.unbearable;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import edu.ycp.cs.cs496.unbearable.model.Login;
+import edu.ycp.cs.cs496.unbearable.model.json.JSON;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -103,15 +117,23 @@ public class RegistrationActivity extends Activity{
   			String checkPassword = password2.getText().toString();
   			if(newPassword.equals(checkPassword))
   			{
-  				//Insert controller here to post it to database
-  	  			Toast.makeText(RegistrationActivity.this,"Registration Successful!", Toast.LENGTH_LONG).show();
-
   	  			// FIXME: use web service
-//  	  			GetLogin logControl = new GetLogin();
-//  	  			logControl.doPostReguest(newUsername, newPassword);
-  	  			
-  	  			startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
-  				
+	  	  		new AsyncReg().execute(newUsername, newPassword);
+	  			boolean check;
+	  			check = false;
+	  			check = AsyncReg.checkLogin;
+	  			
+	  			if(check == true)
+	  			{
+	  				//Username exists and is correct! Go to game
+	  				Toast.makeText(RegistrationActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
+					finish();
+	  			}
+	  			else
+	  			{
+	  				//username doesn't exist or was input wrong, return area
+	  				Toast.makeText(RegistrationActivity.this, "Registration Failed, 404", Toast.LENGTH_SHORT).show();
+	  			}  				
 
   			}
   			else
@@ -120,5 +142,7 @@ public class RegistrationActivity extends Activity{
   			}
   		}
      }
+    
+    
 
 }

@@ -12,7 +12,7 @@ import android.util.DisplayMetrics;
 public class Sprite {
 	private Bitmap bitmap; // spritesheet
 
-	private int x, y; // top left x and y
+	private int x, y; // top left x and y of sprite frame
 
 	private int frameNumber; // number of frames in animation
 	private int currentFrame; // current frame of animation
@@ -36,10 +36,21 @@ public class Sprite {
 	public Sprite(Resources res, int x, int y, int frameWidth, int frameHeight,
 			int fps, int fileID) {
 		bitmap = BitmapFactory.decodeResource(res, fileID);
-		this.frameWidth = frameWidth;
-		this.frameHeight = frameHeight;
-		frameNumber = (bitmap.getWidth() / frameWidth)
-				* (bitmap.getHeight() / frameHeight);
+		
+		if (frameWidth == 0) {
+			this.frameWidth = bitmap.getWidth();
+		} else {
+			this.frameWidth = frameWidth;
+		}
+		
+		if (frameHeight == 0) {
+			this.frameHeight = bitmap.getHeight();
+		} else {
+			this.frameHeight = frameHeight;
+		}
+		
+		frameNumber = (bitmap.getWidth() / this.frameWidth)
+				* (bitmap.getHeight() / this.frameHeight);
 		orientation = Orientation.LEFT;
 
 		currentFrame = 0;
@@ -102,6 +113,22 @@ public class Sprite {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public int getRightX() {
+		return x + frameWidth;
+	}
+	
+	public void setRightX(int x) {
+		this.x = x - frameWidth;
+	}
+	
+	public int getBottomY() {
+		return y + frameHeight;
+	}
+	
+	public void setBottomY(int y) {
+		this.y = y - frameHeight;
+	}
 
 	public int getCurrentFrame() {
 		return currentFrame;
@@ -149,5 +176,10 @@ public class Sprite {
 
 	public void setOrientation(Orientation orientation) {
 		this.orientation = orientation;
+	}
+
+	public int getFrameNumber() {
+		// TODO Auto-generated method stub
+		return frameNumber;
 	}
 }

@@ -1,13 +1,14 @@
 package edu.ycp.cs.cs496.unbearable;
 
-import android.content.res.Resources;
 import edu.ycp.cs.cs496.unbearable.model.Sprite;
+import android.content.res.Resources;
 
-public class Ledge extends Sprite {
+public class Background extends Sprite{
 	
-	public Ledge(Resources res, int x, int y, int frameWidth, int frameHeight,
+	public Background(Resources res, int x, int y, int frameWidth, int frameHeight,
 			int fps, int fileID) {
 		super(res, x, y, frameWidth, frameHeight, fps, fileID);
+		setOrientation(Orientation.RIGHT);
 	}
 	
 	public int getTopY() {
