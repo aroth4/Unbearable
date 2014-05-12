@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -55,6 +56,8 @@ public class GamePanel extends SurfaceView implements Callback {
 	private int highestLedge;
 	private int gameState = 1;
 	private float pX;
+	int score;
+	int weightedScore;
 	
 	private int poolStart = 2; //ledge removed to start pool
 	private int poolEnd = 5; //ledge removed to end pool
@@ -91,6 +94,8 @@ public class GamePanel extends SurfaceView implements Callback {
 		hugMama = false;
 		pX = 0;
 		killedByEnemy = -1;
+		score = 0;
+		weightedScore = 0;
 
 		//getWidth and getHeight deprecated pre-API 13 but this must allow API 10+
 		screenSize = new Point(display.getWidth(),display.getHeight() - statusBarHeight);
@@ -160,6 +165,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		enemies.get(0).setXMax((128*poolEnd)-64);
 		enemies.get(0).setXMin((128*poolStart)+128);
 
+		this.setFocusable(true);
 		this.requestFocus();
 	}
 	
@@ -268,6 +274,8 @@ public class GamePanel extends SurfaceView implements Callback {
 			//Game Win
 			//Don't need to update anything
 			System.out.println("YOU WIN");
+			System.out.println("Score: " + score);
+			System.out.println("Weighted: " + weightedScore);
 		}
 	}
 	
@@ -431,11 +439,12 @@ public class GamePanel extends SurfaceView implements Callback {
 				//safe
 			} else {
 				//game over
-				killedByEnemy = i;
-				playerDead.setX(player.getX());
-				playerDead.setY(player.getY());
-				playerDead.setOrientation(player.getOrientation());
 				if (enemy.getEnemyClass() == EnemyClass.SHARK) {
+					killedByEnemy = i;
+					playerDead.setX(player.getX());
+					playerDead.setY(player.getY());
+					playerDead.setOrientation(player.getOrientation());
+					
 					playerDead.setFrameInitial(0);
 					playerDead.setFrameFinal(0);
 					playerDead.setCurrentFrame(0);
@@ -446,15 +455,26 @@ public class GamePanel extends SurfaceView implements Callback {
 					sharkAttack.setFrameFinal(9);
 					sharkAttack.setCurrentFrame(0);
 					sharkAttack.setOrientation(enemy.getOrientation());
+					gameLose = true;
 				} else if (enemy.getEnemyClass() == EnemyClass.ICICLE) {
-					playerDead.setFrameInitial(1);
-					playerDead.setFrameFinal(1);
-					playerDead.setCurrentFrame(1);
-					
-					enemy.setFrameInitial(0);
-					enemy.setFrameFinal(2);
+					if (fishCollected > 0) {
+						fishCollected--;
+						enemy.setBottomY(screenSize.y + 200);
+					} else {
+						killedByEnemy = i;
+						playerDead.setX(player.getX());
+						playerDead.setY(player.getY());
+						playerDead.setOrientation(player.getOrientation());
+						
+						playerDead.setFrameInitial(1);
+						playerDead.setFrameFinal(1);
+						playerDead.setCurrentFrame(1);
+						
+						enemy.setFrameInitial(0);
+						enemy.setFrameFinal(2);
+						gameLose = true;
+					}
 				}
-				gameLose = true;
 			}
 		}
 	}
@@ -473,6 +493,38 @@ public class GamePanel extends SurfaceView implements Callback {
 				}
 			}
 		}
+	}
+	
+	public int CalculateScore() {
+		//this will see how far away you are from your mother,
+		//that is, how far the polar bear is from its mother,
+		//and then makes a score based on:
+		// distance/10 + fishCollected * 30
+		int distance = bigMama.getX() - player.getX();
+		weightedScore = ((1500-distance)/10) + (fishCollected * 30);
+		return (1500-distance)/10;
+	}
+	
+	public void DrawScore(Canvas canvas) {
+
+		String scoreString = "Score: ";
+		String fishString = "Fish: ";
+		score = CalculateScore();
+		int textHeight = 20;
+		
+		Paint scorePaint = new Paint();
+		scorePaint.setAntiAlias(true);
+		scorePaint.setTextSize(24);
+		scorePaint.setTypeface(Typeface.create(Typeface.SERIF,Typeface.BOLD));
+		scorePaint.setTextAlign(Paint.Align.LEFT);
+		
+		scorePaint.setColor(Color.argb(255, 204, 90, 204));
+		canvas.drawText(scoreString, 0, textHeight, scorePaint);
+		canvas.drawText(("" + score), scorePaint.measureText(scoreString), textHeight, scorePaint);
+		
+		scorePaint.setColor(Color.GREEN);
+		canvas.drawText(fishString, scorePaint.measureText(scoreString+score) + 32, textHeight, scorePaint);
+		canvas.drawText(("" + fishCollected), scorePaint.measureText(scoreString+score+fishString) + 32, textHeight, scorePaint);
 	}
 	
 	boolean checkLedgeBoundaries(int index) {
@@ -547,6 +599,7 @@ public class GamePanel extends SurfaceView implements Callback {
 			} else if (gameWin){ 
 				//gameState = 4;
 				//draw 'good' ending
+				
 			} else {
 				bigMama.doDraw(canvas);
 				player.doDraw(canvas);
@@ -557,35 +610,30 @@ public class GamePanel extends SurfaceView implements Callback {
 				}
 				for (int i = 0; i < enemies.size(); i++)
 					enemies.get(i).doDraw(canvas);
+
+				DrawScore(canvas);
 			}
 		}
 		else if(gameState == 3)
 		{	//gameLose
+			int score = CalculateScore();
 			gameover.doDraw(canvas);
 		}
 		else if(gameState == 4)
 		{	//gameWin
-			
+			int score = CalculateScore();
 		} else {
 			System.out.println("ERROR GAMESTATE");
 		}
 		
 		// Debug information drawing
-		canvas.drawText(
-				"Current Frame: " + player.getCurrentFrame()
-				+ ", Right X: " + player.getRightX()
-				+ ", Left X: " + player.getX()
-				+ ", Top Y: " + player.getY()
-				+ ", Bottom Y: " + player.getBottomY()
-				//+ ", X: " + player.getX() + ", Y: " + player.getY() 
-				//+ ", SX: " + pX
-				//+ ", ledgeLeft: " + ledges.get(0).getLeftX() + ", ledgeRight: " + ledges.get(0).getRightX()
-				//+ ", ledgeLeft: " + ledges.get(0).getLeftX() + ", ledgeRight: " + ledges.get(0).getRightX()
-				//+ ", ledgeDetected: " + ledgeDetected + ", " + wLoc
-				//+ ", screen height: " + screenSize.y +  ", screen width: " + screenSize.x
-				//+ ", Bitmap Width: " + player.getWidth() + ", Bitmap Height: " + player.getHeight()
-				//+ ", Center Width: " + player.getCenterX() + "Center Height: " + player.getCenterY()
-				, 10, 10, pObject);
+//		canvas.drawText(
+//				"Current Frame: " + player.getCurrentFrame()
+//				+ ", Right X: " + player.getRightX()
+//				+ ", Left X: " + player.getX()
+//				+ ", Top Y: " + player.getY()
+//				+ ", Bottom Y: " + player.getBottomY()
+//				, 10, 10, pObject);
 	}
 
 	@Override
