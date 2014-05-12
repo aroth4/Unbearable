@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Mon May 12 17:23:15 EDT 2014:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.2.0 - (1582446): instance a816c00e-0145-f251-7149-000003621548 
+on database directory H:\unbearable.db with class loader sun.misc.Launcher$AppClassLoader@263534c1 
+Loaded from file:/H:/CS496%20mobile%20and%20app/CS320_Derby/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_07-b11
+user.dir=H:\git\Unbearable\UnbearablePersistence
+os.name=Windows 7
+os.arch=amd64
+os.version=6.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
