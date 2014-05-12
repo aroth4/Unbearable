@@ -82,9 +82,17 @@ public boolean Registration(String username, String password)throws URISyntaxExc
 		if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 			// Copy the response body to a string
 			HttpEntity entity = response.getEntity();
-			System.out.println("SUCCESS");
-			checkLogin = true;
-			return true;
+			
+			if (entity == null){
+				System.out.println("registration failed!");
+				checkLogin = false;
+				return false;
+			}else{
+				System.out.println("Registration is a SUCCESS");
+				checkLogin = true;
+				return true;
+			}
+			
 		}
 		else{	
 			System.out.println("FAILED");

@@ -5,6 +5,7 @@ public class DatabaseProvider {
 	
 	public static void setInstance(IDatabase db) {
 		theInstance = db;
+		
 	}
 	
 	public static IDatabase getInstance() {

@@ -27,14 +27,9 @@ public class DerbyDatabase implements IDatabase {
 	//nothing
 	private static final int MAX_ATTEMPTS = 10;
 
-	
-	
-
-	
-	
 
 	private Connection connect() throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:derby:H:/stocksimulation.db;create=true");
+		Connection conn = DriverManager.getConnection("jdbc:derby:H:/unbearable.db;create=true");
 		
 		// Set autocommit to false to allow multiple the execution of
 		// multiple queries/statements as part of the same transaction.
@@ -92,34 +87,24 @@ public class DerbyDatabase implements IDatabase {
 		executeTransaction(new ITransaction<Boolean>() {
 			@Override
 			public Boolean execute(Connection conn) throws SQLException {
+				
 				PreparedStatement stmt = null;
-				PreparedStatement stmt2 = null;
-				PreparedStatement stmt3 = null;
+	
 				try {
 					// login table
 					stmt = conn.prepareStatement(
-							"create table logins (" +
+							"create table login (" +
 							"   id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY," +
 							"   username varchar(40) not null unique," +
 							"   password varchar(40) not null" +
 							")"
 							);
 					stmt.executeUpdate();
-					// cash table
-					stmt2 = conn.prepareStatement(
-							"create table score (" +
-							"   id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY," +
-							"   cashAmount money not null" +
-							")"
-							);
-					stmt2.executeUpdate();
-					
 					
 					return true;
+					
 				} finally {
 					DBUtil.closeQuietly(stmt);
-					DBUtil.closeQuietly(stmt2);
-					DBUtil.closeQuietly(stmt3);
 				}
 			}
 		});
@@ -141,15 +126,13 @@ public class DerbyDatabase implements IDatabase {
 				
 				try {
 					// login
-					insertLogin = conn.prepareStatement("insert into logins (username, password) values (?, ?)");
+					insertLogin = conn.prepareStatement("insert into login (username, password) values (?, ?)");
 					insertLogin.setString(1, log.getUsername());
 					insertLogin.setString(2, log.getPassword());
 					
 					insertLogin.executeUpdate();
-					
-					
-					
 					return true;
+					
 				} finally {
 					DBUtil.closeQuietly(insertLogin);
 						
@@ -165,13 +148,13 @@ public class DerbyDatabase implements IDatabase {
 		System.out.println("Creating tables...");
 		DerbyDatabase db = new DerbyDatabase();
 		db.createTables();
-		
+	
 		System.out.println("Loading initial data...");
 		db.loadInitialData();
-		
+	
 		System.out.println("Success!");
 	}
-
+    // login
 	@Override
 	public Login getLogin(final String username, final String password) {
 		return executeTransaction(new ITransaction<Login>() {
@@ -182,16 +165,15 @@ public class DerbyDatabase implements IDatabase {
 		
 				try {
 					stmt = conn.prepareStatement(
-						"select logins.*" +
-						" from logins" + 
-						" where logins.username = ?" +
-						" and logins.password = ?"
+						"select login.*" +
+						" from login" + 
+						" where login.username = ?" +
+						" and login.password = ?"
 					);
 					stmt.setString(1, username);
 					stmt.setString(2, password);
 					
 					resultSet = stmt.executeQuery();
-					//System.out.println("resultSet: "+resultSet.next());
 					
 					if (resultSet.next()){
 						
@@ -208,6 +190,7 @@ public class DerbyDatabase implements IDatabase {
 		});
 	}
 
+	// responsible for registration
 	@Override
 	public Login postLogin(final String username, final String password) {
 		return executeTransaction(new ITransaction<Login>() {
@@ -222,9 +205,8 @@ public class DerbyDatabase implements IDatabase {
 				PreparedStatement stmt = null;
 				
 				try {
-					stmt = conn.prepareStatement(
-						"insert into logins (username, password) values (?, ?)"
-					);
+					stmt = conn.prepareStatement("insert into login (username, password) values (?, ?)");
+					System.out.println("It registered: "+username+" and " + password);
 					stmt.setString(1, username);
 					stmt.setString(2, password);
 					
@@ -247,9 +229,9 @@ public class DerbyDatabase implements IDatabase {
 		Login accountLogin = null;
 		try {
 			stmt = conn.prepareStatement(
-				"select logins.*" +
-				" from logins" + 
-				" where logins.username = ?"
+				"select login.*" +
+				" from login" + 
+				" where login.username = ?"
 			);
 			stmt.setString(1, username);
 			
@@ -269,4 +251,5 @@ public class DerbyDatabase implements IDatabase {
 		}
 	}
 	
+
 }
