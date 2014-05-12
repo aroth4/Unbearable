@@ -173,14 +173,100 @@ public class DerbyDatabase implements IDatabase {
 	}
 
 	@Override
-	public Login getLogin(String username, String password) {
-		// TODO Auto-generated method stub
-		return null;
+	public Login getLogin(final String username, final String password) {
+		return executeTransaction(new ITransaction<Login>() {
+			@Override
+			public Login execute(Connection conn) throws SQLException {
+				PreparedStatement stmt = null;
+				ResultSet resultSet = null;
+		
+				try {
+					stmt = conn.prepareStatement(
+						"select logins.*" +
+						" from logins" + 
+						" where logins.username = ?" +
+						" and logins.password = ?"
+					);
+					stmt.setString(1, username);
+					stmt.setString(2, password);
+					
+					resultSet = stmt.executeQuery();
+					//System.out.println("resultSet: "+resultSet.next());
+					
+					if (resultSet.next()){
+						
+						return new Login(username,password);
+					}else{
+						return null;
+					}
+					
+				} finally {
+					DBUtil.closeQuietly(resultSet);
+					DBUtil.closeQuietly(stmt);
+				}
+			}
+		});
 	}
 
 	@Override
-	public Login postLogin(String username, String password) {
-		// TODO Auto-generated method stub
-		return null;
+	public Login postLogin(final String username, final String password) {
+		return executeTransaction(new ITransaction<Login>() {
+			@Override
+			public Login execute(Connection conn) throws SQLException {
+				Login existing = doFindLogin(username, conn);
+				if (existing != null) {
+					System.out.println("That username has already been registered!");
+					return null;
+				}
+				
+				PreparedStatement stmt = null;
+				
+				try {
+					stmt = conn.prepareStatement(
+						"insert into logins (username, password) values (?, ?)"
+					);
+					stmt.setString(1, username);
+					stmt.setString(2, password);
+					
+					stmt.executeUpdate();
+				
+					return new Login(username,password);
+					
+				} finally {
+					DBUtil.closeQuietly(stmt);
+				}
+			}
+		});
 	}
+	
+	// method to determine if username exist in database
+	private Login doFindLogin(final String username, Connection conn)
+			throws SQLException {
+		PreparedStatement stmt = null;
+		ResultSet resultSet = null;
+		Login accountLogin = null;
+		try {
+			stmt = conn.prepareStatement(
+				"select logins.*" +
+				" from logins" + 
+				" where logins.username = ?"
+			);
+			stmt.setString(1, username);
+			
+			resultSet = stmt.executeQuery();
+			
+			if (resultSet.next()){;
+				accountLogin = new Login();
+				accountLogin.setUsername(username);
+				return accountLogin;
+			}else{
+				return accountLogin;
+			}
+			
+		} finally {
+			DBUtil.closeQuietly(resultSet);
+			DBUtil.closeQuietly(stmt);
+		}
+	}
+	
 }
