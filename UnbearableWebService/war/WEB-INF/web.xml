@@ -23,7 +23,7 @@
 	
 	<servlet-mapping>
 	    <servlet-name>RegistrationServlet</servlet-name>
-		<url-pattern>/newlogin/*</url-pattern>
+		<url-pattern>/login/*</url-pattern>
 	</servlet-mapping>
 
 	

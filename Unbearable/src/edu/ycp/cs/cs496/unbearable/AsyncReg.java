@@ -52,7 +52,7 @@ public boolean Registration(String username, String password)throws URISyntaxExc
 		HttpClient client = new DefaultHttpClient();
 		// Construct URI
 
-		String uri = "http://10.0.2.2:8081/newlogin";
+		String uri = "http://10.0.2.2:8081/login";
 		
 		//loginPost getPost = new loginPost();
 		
