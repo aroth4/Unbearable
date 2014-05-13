@@ -1,7 +1,6 @@
-package edu.ycp.cs.cs496.unbearable;
+package edu.ycp.cs.cs496.unbearable.model;
 
 import android.content.res.Resources;
-import edu.ycp.cs.cs496.unbearable.model.Sprite;
 
 public class Collectible extends Sprite {
 	

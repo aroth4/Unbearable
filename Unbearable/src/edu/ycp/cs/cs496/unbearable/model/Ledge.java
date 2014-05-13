@@ -1,6 +1,5 @@
-package edu.ycp.cs.cs496.unbearable;
+package edu.ycp.cs.cs496.unbearable.model;
 
-import edu.ycp.cs.cs496.unbearable.model.Sprite;
 import android.content.res.Resources;
 
 public class Ledge extends Sprite {

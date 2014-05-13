@@ -1,10 +1,9 @@
-package edu.ycp.cs.cs496.unbearable;
+package edu.ycp.cs.cs496.unbearable.model;
 
 import java.io.Console;
 
 import android.content.res.Resources;
-import edu.ycp.cs.cs496.unbearable.model.Sprite;
-import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
+import edu.ycp.cs.cs496.unbearable.GamePanel;
 
 public class Player extends Sprite {
 

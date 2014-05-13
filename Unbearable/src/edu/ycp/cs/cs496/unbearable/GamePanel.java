@@ -17,8 +17,14 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.WindowManager;
-import edu.ycp.cs.cs496.unbearable.Enemy.EnemyClass;
+import edu.ycp.cs.cs496.unbearable.model.Background;
+import edu.ycp.cs.cs496.unbearable.model.Collectible;
+import edu.ycp.cs.cs496.unbearable.model.Enemy;
+import edu.ycp.cs.cs496.unbearable.model.Ledge;
+import edu.ycp.cs.cs496.unbearable.model.MenuItem;
+import edu.ycp.cs.cs496.unbearable.model.Player;
 import edu.ycp.cs.cs496.unbearable.model.Sprite;
+import edu.ycp.cs.cs496.unbearable.model.Enemy.EnemyClass;
 import edu.ycp.cs.cs496.unbearable.model.Sprite.Orientation;
 
 public class GamePanel extends SurfaceView implements Callback {
@@ -71,6 +77,7 @@ public class GamePanel extends SurfaceView implements Callback {
 	private static int groundLevel;
 	GameActivity goBack;
 	private Background gameover;
+	private Background gamewinimage;
 	
 	public GamePanel(Context context, int statusBarHeight) {
 		super(context);
@@ -104,6 +111,7 @@ public class GamePanel extends SurfaceView implements Callback {
 		
 		background  = new Background(getResources(), 0, 0, 0, 0, 10, R.drawable.background);
 		gameover = new Background(getResources(), 0, 0, 0 ,0, 10, R.drawable.gameover);
+		gamewinimage = new Background(getResources(), 0, 0, 0 ,0, 10, R.drawable.gamewin);
 		player = new Player(getResources(), 10, 0, 64, 64, 30,
 			R.drawable.bear); //spawns bear at top of screen, so he falls to ground
 		playerDead = new Sprite(getResources(), 100, 100, 64, 64, 10, R.drawable.bearbedead);
@@ -124,14 +132,8 @@ public class GamePanel extends SurfaceView implements Callback {
 		randomListX(n);
 		randomListY(n);
 
-		ledges.add(new Ledge(getResources(), 0, 64, 128, 32, 10,
-				R.drawable.ledge));
+		ledges.add(new Ledge(getResources(), 400, screenSize.y - 128, 128, 32, 10, R.drawable.ledge));
 		
-		//ledges from top to bottom, debug ledges
-//		for (int i = 0; i < screenSize.y; i+= 64) {
-//			ledges.add(new Ledge(getResources(), 0, 128 + i, 128, 32, 10, R.drawable.ledge));
-//		}
-
 		//Add the menu items
 		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameunselected));
 		menus.add(new MenuItem(getResources(), screenSize.x/2 - 150, screenSize.y/2 - 50, 300, 100, 30, R.drawable.playgameselected));
@@ -274,8 +276,6 @@ public class GamePanel extends SurfaceView implements Callback {
 			//Game Win
 			//Don't need to update anything
 			System.out.println("YOU WIN");
-			System.out.println("Score: " + score);
-			System.out.println("Weighted: " + weightedScore);
 		}
 	}
 	
@@ -501,12 +501,14 @@ public class GamePanel extends SurfaceView implements Callback {
 		//and then makes a score based on:
 		// distance/10 + fishCollected * 30
 		int distance = bigMama.getX() - player.getX();
-		weightedScore = ((1500-distance)/10) + (fishCollected * 30);
 		return (1500-distance)/10;
 	}
 	
+	public int CalculateWeightedScore() {
+		return (score + (fishCollected * 30));
+	}
+	
 	public void DrawScore(Canvas canvas) {
-
 		String scoreString = "Score: ";
 		String fishString = "Fish: ";
 		score = CalculateScore();
@@ -525,6 +527,27 @@ public class GamePanel extends SurfaceView implements Callback {
 		scorePaint.setColor(Color.GREEN);
 		canvas.drawText(fishString, scorePaint.measureText(scoreString+score) + 32, textHeight, scorePaint);
 		canvas.drawText(("" + fishCollected), scorePaint.measureText(scoreString+score+fishString) + 32, textHeight, scorePaint);
+	}
+	
+	public void drawFinalScore(Canvas canvas) {
+		String congratz = "CONGRATULATIONS!";
+		if (gameLose) { congratz = ""; }
+		String scoreString = "Final score: ";
+		weightedScore = CalculateWeightedScore();
+
+		Paint scorePaint = new Paint();
+		scorePaint.setAntiAlias(true);
+		scorePaint.setTextSize(48);
+		scorePaint.setTypeface(Typeface.create(Typeface.SERIF,Typeface.BOLD));
+		scorePaint.setTextAlign(Paint.Align.CENTER);
+
+		scorePaint.setColor(Color.GREEN);
+		canvas.drawText(congratz, screenSize.x/2, (screenSize.y/4)+32, scorePaint);
+
+		scorePaint.setTextSize(36);
+		scorePaint.setColor(Color.argb(255, 204, 90, 204));
+		canvas.drawText(scoreString + weightedScore, screenSize.x/2, screenSize.y/2+32, scorePaint);
+		
 	}
 	
 	boolean checkLedgeBoundaries(int index) {
@@ -598,8 +621,6 @@ public class GamePanel extends SurfaceView implements Callback {
 				}
 			} else if (gameWin){ 
 				//gameState = 4;
-				//draw 'good' ending
-				
 			} else {
 				bigMama.doDraw(canvas);
 				player.doDraw(canvas);
@@ -616,12 +637,13 @@ public class GamePanel extends SurfaceView implements Callback {
 		}
 		else if(gameState == 3)
 		{	//gameLose
-			int score = CalculateScore();
 			gameover.doDraw(canvas);
+			drawFinalScore(canvas);
 		}
 		else if(gameState == 4)
 		{	//gameWin
-			int score = CalculateScore();
+			gamewinimage.doDraw(canvas);
+			drawFinalScore(canvas);
 		} else {
 			System.out.println("ERROR GAMESTATE");
 		}
